@@ -129,7 +129,7 @@ const blog = await getRecentPosts(SITE.featuredPostCount)
         
         <div class="grid gap-3 flex-1">
           {blog.slice(0, 3).map((post) => (
-            <Link href={`/blog/${post.slug}`} class="block group">
+            <Link href={`/blog/${post.id}`} class="block group">
               <div class="p-3 rounded-xl bg-background/40 hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all duration-300 flex justify-between items-center">
                  <div>
                    <h4 class="font-medium text-sm group-hover:text-primary transition-colors line-clamp-1">{post.data.title}</h4>
