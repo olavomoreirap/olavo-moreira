@@ -4,10 +4,10 @@
 
 @theme inline {
   --font-sans:
-    Geist, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
   --font-mono:
-    Geist Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
 
   --color-background: var(--background);
@@ -68,19 +68,19 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --ring: oklch(0.556 0 0);
+  --background: oklch(0.13 0.08 285); /* Deep Purple */
+  --foreground: oklch(0.95 0.02 300); /* Pinkish White */
+  --primary: oklch(0.7 0.2 320); /* Neon Pink/Magenta */
+  --primary-foreground: oklch(0.13 0.08 285);
+  --secondary: oklch(0.25 0.1 290); /* Dark Violet */
+  --secondary-foreground: oklch(0.95 0.02 300);
+  --muted: oklch(0.2 0.08 285);
+  --muted-foreground: oklch(0.7 0.1 300);
+  --accent: oklch(0.25 0.1 290);
+  --accent-foreground: oklch(0.95 0.02 300);
+  --destructive: oklch(0.6 0.2 20);
+  --border: oklch(0.4 0.15 300); /* Purple Glow Border */
+  --ring: oklch(0.6 0.2 320); /* Pink Ring */
 }
 
 @layer base {
@@ -99,8 +99,20 @@
       @apply scheme-dark;
     }
 
-    ::-webkit-scrollbar-corner {
-      @apply bg-transparent;
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      @apply bg-background;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      @apply bg-muted rounded-full border-2 border-background;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      @apply bg-muted-foreground;
     }
   }
 

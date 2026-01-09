@@ -5,6 +5,9 @@ import MobileMenu from '@/components/ui/mobile-menu'
 import { NAV_LINKS, SITE } from '@/consts'
 import { Image } from 'astro:assets'
 import logo from '../../public/static/logo.svg'
+import { cn } from '@/lib/utils'
+
+const { isWide = false } = Astro.props
 ---
 
 <header
@@ -12,11 +15,16 @@ import logo from '../../public/static/logo.svg'
   transition:persist
 >
   <div
-    class="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 p-4"
+    class={cn(
+      'mx-auto flex flex-wrap items-center justify-between gap-4 p-4',
+      isWide ? 'max-w-7xl' : 'max-w-3xl',
+    )}
   >
-    <Link href="/" class="flex shrink-0 items-center gap-2 text-xl font-medium">
-      <Image src={logo} alt="Logo" class="size-8" />
-      {SITE.title}
+    <Link href="/" class="flex shrink-0 items-center gap-2 text-xl font-medium group transition-colors">
+      <Image src={logo} alt="Logo" class="size-8 group-hover:drop-shadow-[0_0_8px_rgba(236,72,153,0.5)] transition-all" />
+      <span class="group-hover:text-primary transition-colors">
+        {SITE.title}
+      </span>
     </Link>
     <div class="flex items-center gap-2 md:gap-4">
       <nav class="hidden items-center gap-4 text-sm sm:gap-6 md:flex">

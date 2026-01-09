@@ -18,7 +18,7 @@ const { isWide = false } = Astro.props
   </Head>
   <body>
     <div class="flex h-fit min-h-screen flex-col gap-y-6 font-sans">
-      <Header />
+      <Header isWide={isWide} />
       <main class="grow">
         <div
           class={cn(
@@ -29,7 +29,7 @@ const { isWide = false } = Astro.props
           <slot />
         </div>
       </main>
-      <Footer />
+      <Footer isWide={isWide} />
     </div>
   </body>
 </html>
