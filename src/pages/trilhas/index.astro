@@ -1,0 +1,60 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getAllCategories } from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+
+const categories = await getAllCategories()
+---
+
+<Layout>
+  <PageHead
+    slot="head"
+    title="Trilhas"
+    description="Trilhas de estudo para acompanhar o progresso por tema."
+  />
+  <Breadcrumbs items={[{ label: 'Trilhas', icon: 'lucide:layers' }]} />
+
+  <section class="space-y-6">
+    <div class="prose">
+      <h1>Trilhas de estudo</h1>
+      <p>
+        Cada trilha agrupa posts por tema para seguir uma sequencia clara de
+        aprendizado.
+      </p>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      {categories.map((category) => (
+        <Link
+          href={`/trilhas/${category.id}`}
+          class={`group relative rounded-2xl border border-primary/15 bg-secondary/30 p-6 transition-all duration-300 hover:border-primary/40 hover:bg-secondary/50 overflow-hidden`}
+        >
+          <div
+            class={`pointer-events-none absolute inset-0 bg-gradient-to-br ${category.accent} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
+          ></div>
+          <div class="relative flex h-full flex-col gap-4">
+            <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+              <Icon name={category.icon} class="size-4 text-primary" />
+              Trilha
+            </div>
+            <div>
+              <h2 class="text-xl font-medium group-hover:text-primary transition-colors">
+                {category.label}
+              </h2>
+              <p class="text-sm text-muted-foreground mt-2">
+                {category.description}
+              </p>
+            </div>
+            <div class="mt-auto flex items-center justify-between text-xs text-muted-foreground">
+              <span>{category.count} estudos</span>
+              <span class="text-primary">Ver trilha →</span>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </section>
+</Layout>

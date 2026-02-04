@@ -1,7 +1,8 @@
 ---
-title: "Princípios de Programação Orientada a Objetos"
-description: "Entenda os pilares fundamentais da POO."
-date: "2026-01-08"
+title: 'Princípios de Programação Orientada a Objetos'
+description: 'Entenda os pilares fundamentais da POO.'
+date: '2026-01-08'
+category: 'java-inicial'
 tags:
   - programação
   - oop
@@ -238,6 +239,7 @@ public interface Avenger {
     void salvarMundo();
 }
 ```
+
 E aí, qualquer classe que implementar essa interface, vai precisar obrigatoriamente implementar esses métodos.
 
 ```java

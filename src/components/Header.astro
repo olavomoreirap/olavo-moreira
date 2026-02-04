@@ -39,7 +39,7 @@ const { isWide = false } = Astro.props
           ))
         }
       </nav>
-      <MobileMenu client:load transition:persist />
+      <MobileMenu client:media="(max-width: 768px)" transition:persist />
       <ThemeToggle transition:persist />
     </div>
   </div>

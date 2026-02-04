@@ -1,4 +1,7 @@
+import { BLOG_CATEGORIES } from '@/consts'
 import { getCollection, type CollectionEntry } from 'astro:content'
+
+type CategoryWithCount = (typeof BLOG_CATEGORIES)[number] & { count: number }
 
 export async function getAllPosts(): Promise<CollectionEntry<'blog'>[]> {
   const posts = await getCollection('blog')
@@ -111,4 +114,25 @@ export async function getPostsByTag(
 ): Promise<CollectionEntry<'blog'>[]> {
   const posts = await getAllPosts()
   return posts.filter((post) => post.data.tags?.includes(tag))
+}
+
+export async function getPostsByCategory(
+  categoryId: string,
+): Promise<CollectionEntry<'blog'>[]> {
+  const posts = await getAllPosts()
+  return posts.filter((post) => post.data.category === categoryId)
+}
+
+export async function getAllCategories(): Promise<CategoryWithCount[]> {
+  const posts = await getAllPosts()
+  const counts = posts.reduce((acc, post) => {
+    const categoryId = post.data.category
+    acc.set(categoryId, (acc.get(categoryId) || 0) + 1)
+    return acc
+  }, new Map<string, number>())
+
+  return BLOG_CATEGORIES.map((category) => ({
+    ...category,
+    count: counts.get(category.id) || 0,
+  }))
 }

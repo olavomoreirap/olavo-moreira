@@ -1,6 +1,7 @@
 ---
 import Link from '@/components/Link.astro'
 import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
@@ -11,34 +12,53 @@ interface Props {
 }
 
 const { project } = Astro.props
+const isSaaS = project.data.tags?.includes('SaaS')
+const projectHref = `/projects/${project.id}`
 ---
 
 <div
-  class="hover:bg-secondary/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+  class:list={[
+    'group relative rounded-xl border p-4 transition-all duration-300 ease-in-out hover:bg-secondary/50',
+    isSaaS &&
+      'ring-1 ring-primary/30 border-primary/40 bg-primary/5 shadow-[0_0_0_1px_rgba(168,85,247,0.15)]',
+  ]}
 >
-  <Link
-    href={project.data.link}
-    class="flex flex-col gap-4 sm:flex-row"
-    external
-  >
+  <div class="flex flex-col gap-4 lg:flex-row">
     {
       project.data.image && (
-        <div class="max-w-3xs sm:shrink-0">
+        <Link
+          href={projectHref}
+          class="w-full rounded-lg overflow-hidden border border-primary/10 bg-background/40 lg:max-w-3xs lg:shrink-0"
+        >
           <Image
             src={project.data.image}
             alt={project.data.name}
             width={1200}
             height={630}
-            class="object-cover"
+            class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
           />
-        </div>
+        </Link>
       )
     }
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-medium">
-        {project.data.name}
+    <div class="grow min-w-0">
+      {
+        isSaaS && (
+          <div class="mb-2 flex items-center gap-2 text-xs">
+            <Badge className="border border-primary/30 bg-primary/15 text-primary">
+              SaaS
+            </Badge>
+            <span class="rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary/80">
+              Destaque
+            </span>
+          </div>
+        )
+      }
+      <h3 class="mb-1 text-lg font-medium transition-colors group-hover:text-primary">
+        <Link href={projectHref} class="hover:text-primary">
+          {project.data.name}
+        </Link>
       </h3>
-      <p class="text-muted-foreground mb-2 text-sm">
+      <p class="text-muted-foreground mb-2 text-sm line-clamp-3">
         {project.data.description}
       </p>
       {
@@ -60,11 +80,25 @@ const { project } = Astro.props
         project.data.tags && (
           <div class="flex flex-wrap gap-2">
             {project.data.tags.map((tag: string) => (
-              <Badge variant="secondary">{tag}</Badge>
+              <Badge variant="secondary" className="max-w-full whitespace-normal">
+                {tag}
+              </Badge>
             ))}
           </div>
         )
       }
+      <div class="mt-4 flex flex-wrap gap-2">
+        <Link href={projectHref} class={buttonVariants({ size: 'sm' })}>
+          Ler mais
+        </Link>
+        <Link
+          href={project.data.link}
+          external
+          class={buttonVariants({ variant: 'outline', size: 'sm' })}
+        >
+          Abrir projeto
+        </Link>
+      </div>
     </div>
-  </Link>
+  </div>
 </div>

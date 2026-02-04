@@ -1,4 +1,4 @@
-import type { IconMap, SocialLink, Site } from '@/types'
+import type { BlogCategory, IconMap, SocialLink, Site } from '@/types'
 
 export const SITE: Site = {
   title: 'Olavo Moreira',
@@ -15,6 +15,10 @@ export const NAV_LINKS: SocialLink[] = [
   {
     href: '/blog',
     label: 'blog',
+  },
+  {
+    href: '/trilhas',
+    label: 'trilhas',
   },
   {
     href: '/authors',
@@ -53,3 +57,20 @@ export const ICON_MAP: IconMap = {
   Email: 'lucide:mail',
   RSS: 'lucide:rss',
 }
+
+export const BLOG_CATEGORIES: BlogCategory[] = [
+  {
+    id: 'java-inicial',
+    label: 'Java Inicial',
+    description: 'Fundamentos da linguagem, POO e colecoes para base solida.',
+    icon: 'lucide:coffee',
+    accent: 'from-amber-500/20 via-orange-500/10 to-transparent',
+  },
+  {
+    id: 'spring-boot',
+    label: 'Spring Boot',
+    description: 'APIs, dados, testes e deploy em producao.',
+    icon: 'lucide:leaf',
+    accent: 'from-emerald-500/20 via-green-500/10 to-transparent',
+  },
+]

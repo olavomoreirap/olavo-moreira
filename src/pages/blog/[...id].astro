@@ -153,21 +153,32 @@ const authors = await parseAuthors(post.data.authors ?? [])
       const scrollToTopButton = document.getElementById('scroll-to-top')
       const footer = document.querySelector('footer')
 
-      if (scrollToTopButton && footer) {
-        scrollToTopButton.addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        })
+      if (!scrollToTopButton || !footer) return
 
-        window.addEventListener('scroll', () => {
-          const footerRect = footer.getBoundingClientRect()
-          const isFooterVisible = footerRect.top <= window.innerHeight
-
-          scrollToTopButton.classList.toggle(
-            'hidden',
-            window.scrollY <= 300 || isFooterVisible,
-          )
-        })
+      const handleClick = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
+
+      const handleScroll = () => {
+        const footerRect = footer.getBoundingClientRect()
+        const isFooterVisible = footerRect.top <= window.innerHeight
+
+        scrollToTopButton.classList.toggle(
+          'hidden',
+          window.scrollY <= 300 || isFooterVisible,
+        )
+      }
+
+      scrollToTopButton.addEventListener('click', handleClick)
+      window.addEventListener('scroll', handleScroll, { passive: true })
+
+      const cleanup = () => {
+        scrollToTopButton.removeEventListener('click', handleClick)
+        window.removeEventListener('scroll', handleScroll)
+        document.removeEventListener('astro:before-swap', cleanup)
+      }
+
+      document.addEventListener('astro:before-swap', cleanup)
     })
   </script>
 </Layout>

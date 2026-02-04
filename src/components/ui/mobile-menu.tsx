@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { NAV_LINKS } from '@/consts'
-import { Menu } from 'lucide-react'
+import Menu from 'lucide-react/dist/esm/icons/menu'
 
 const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -29,9 +29,10 @@ const MobileMenu = () => {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={(val) => setIsOpen(val)}>
-      <DropdownMenuTrigger asChild
+      <DropdownMenuTrigger
+        asChild
         onClick={() => {
-          setIsOpen((val) => !val);
+          setIsOpen((val) => !val)
         }}
       >
         <Button

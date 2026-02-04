@@ -1,30 +1,61 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
 import Layout from '@/layouts/Layout.astro'
 import { getAllProjects } from '@/lib/data-utils'
 
 const projects = await getAllProjects()
+const featuredProjects = projects.filter((project) =>
+  project.data.tags?.includes('SaaS'),
+)
+const otherProjects = projects.filter(
+  (project) => !project.data.tags?.includes('SaaS'),
+)
 ---
 
-<Layout>
-  <PageHead slot="head" title="About" />
-  <Breadcrumbs items={[{ label: 'About', icon: 'lucide:info' }]} />
+<Layout isWide>
+  <PageHead slot="head" title="Sobre" />
+  <div class="mx-auto w-full max-w-5xl flex flex-col gap-y-6">
+    <Breadcrumbs items={[{ label: 'Sobre', icon: 'lucide:info' }]} />
 
-  <section>
-    <div class="min-w-full">
-      <div class="prose mb-8">
-        <p class="mb-4">
-          Hi.
-        </p>
+    <section class="space-y-10">
+      <div class="min-w-full">
+        <div class="prose">
+          <h1>Sobre</h1>
+          <p>
+            Sou desenvolvedor backend com foco em Java e produtos SaaS. Aqui
+            compartilho estudos e aplico o que estou construindo em projetos reais.
+          </p>
+        </div>
       </div>
 
-      <h2 class="mb-4 text-2xl font-medium">Example Projects Listing</h2>
-      <div class="flex flex-col gap-4">
-        {projects.map((project) => <ProjectCard project={project} />)}
+      <div>
+        <div class="mb-4">
+          <h2 class="text-2xl font-medium">Projetos em destaque</h2>
+          <p class="text-sm text-muted-foreground">
+            SaaS que estou construindo e evoluindo agora.
+          </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          {featuredProjects.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
+
+      {
+        otherProjects.length > 0 && (
+          <div>
+            <h3 class="mb-4 text-lg font-medium">Outros projetos</h3>
+            <div class="flex flex-col gap-4">
+              {otherProjects.map((project) => (
+                <ProjectCard project={project} />
+              ))}
+            </div>
+          </div>
+        )
+      }
+    </section>
+  </div>
 </Layout>

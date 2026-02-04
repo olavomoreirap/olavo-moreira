@@ -2,6 +2,7 @@
 import AvatarComponent from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { BLOG_CATEGORIES } from '@/consts'
 import { parseAuthors } from '@/lib/data-utils'
 import { formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
@@ -17,6 +18,10 @@ const { entry } = Astro.props
 const formattedDate = formatDate(entry.data.date)
 const readTime = readingTime(entry.body!)
 const authors = await parseAuthors(entry.data.authors ?? [])
+const categoryMeta = BLOG_CATEGORIES.find(
+  (category) => category.id === entry.data.category,
+)
+const categoryLabel = categoryMeta?.label ?? entry.data.category
 ---
 
 <div
@@ -41,6 +46,16 @@ const authors = await parseAuthors(entry.data.authors ?? [])
     }
 
     <div class="grow">
+      {
+        categoryLabel && (
+          <div class="mb-2 flex items-center gap-2 text-xs">
+            <Badge variant="outline" className="uppercase tracking-wide">
+              <Icon name="lucide:layers" class="size-3" />
+              {categoryLabel}
+            </Badge>
+          </div>
+        )
+      }
       <h3 class="mb-1 text-lg font-medium">{entry.data.title}</h3>
       <p class="text-muted-foreground mb-2 text-sm">{entry.data.description}</p>
 
@@ -53,7 +68,6 @@ const authors = await parseAuthors(entry.data.authors ?? [])
               {authors.map((author) => (
                 <div class="flex items-center gap-x-1.5">
                   <AvatarComponent
-                    client:load
                     src={author.avatar}
                     alt={author.name}
                     fallback={author.name[0]}

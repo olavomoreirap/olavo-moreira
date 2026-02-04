@@ -1,0 +1,89 @@
+---
+import BlogCard from '@/components/BlogCard.astro'
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import { buttonVariants } from '@/components/ui/button'
+import { BLOG_CATEGORIES } from '@/consts'
+import Layout from '@/layouts/Layout.astro'
+import { getAllPosts } from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
+
+type Category = (typeof BLOG_CATEGORIES)[number]
+type Props = {
+  category: Category
+  posts: CollectionEntry<'blog'>[]
+}
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts()
+
+  return BLOG_CATEGORIES.map((category: Category) => ({
+    params: { id: category.id },
+    props: {
+      category,
+      posts: posts.filter(
+        (post: CollectionEntry<'blog'>) => post.data.category === category.id,
+      ),
+    },
+  }))
+}
+
+const { category, posts } = Astro.props as Props
+const isAscending = category.id === 'java-inicial'
+const sortedPosts = [...posts].sort((a, b) =>
+  isAscending
+    ? a.data.date.valueOf() - b.data.date.valueOf()
+    : b.data.date.valueOf() - a.data.date.valueOf(),
+)
+---
+
+<Layout>
+  <PageHead
+    slot="head"
+    title={`Trilha: ${category.label}`}
+    description={category.description}
+  />
+  <Breadcrumbs
+    items={[
+      { href: '/trilhas', label: 'Trilhas', icon: 'lucide:layers' },
+      { label: category.label, icon: category.icon },
+    ]}
+  />
+
+  <section class="space-y-6">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+        <Icon name={category.icon} class="size-4 text-primary" />
+        Trilha
+      </div>
+      <h1 class="text-3xl font-medium">{category.label}</h1>
+      <p class="text-sm text-muted-foreground">{category.description}</p>
+    </div>
+
+    {
+      sortedPosts.length > 0 ? (
+        <ul class="flex flex-col gap-4">
+          {sortedPosts.map((post) => (
+            <li>
+              <BlogCard entry={post} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="rounded-2xl border border-primary/15 bg-secondary/30 p-6">
+          <p class="text-muted-foreground">
+            Essa trilha esta em preparacao. Os primeiros estudos entram em
+            breve.
+          </p>
+          <div class="mt-4">
+            <Link href="/blog" class={buttonVariants({ variant: 'outline' })}>
+              Ver posts recentes
+            </Link>
+          </div>
+        </div>
+      )
+    }
+  </section>
+</Layout>

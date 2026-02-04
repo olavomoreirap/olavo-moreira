@@ -16,3 +16,11 @@ export type SocialLink = {
 export type IconMap = {
   [key: string]: string
 }
+
+export type BlogCategory = {
+  id: string
+  label: string
+  description: string
+  icon: string
+  accent: string
+}
