@@ -3,7 +3,7 @@ import type { BlogCategory, IconMap, SocialLink, Site } from '@/types'
 export const SITE: Site = {
   title: 'Olavo Moreira',
   description:
-    'Backend Developer Java & Spring Boot. Estudos, trilhas e projetos sobre o ecossistema Java.',
+    'Full Stack Developer com ênfase em Java & Spring Boot. Estudos, trilhas e projetos sobre o ecossistema Java.',
   href: 'https://olavo-moreira.vercel.app',
   author: 'Olavo Moreira',
   locale: 'pt-BR',

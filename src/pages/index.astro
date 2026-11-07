@@ -41,11 +41,12 @@ const mailto = `mailto:${CONTACT.email}`
           {SITE.author}
         </h1>
 
-        <p class="hero__role">Backend Developer · Java &amp; Spring Boot</p>
+        <p class="hero__role">Full Stack Developer · ênfase em Java &amp; Spring Boot</p>
 
         <p class="hero__proof">
-          Trainee na Petize, trabalhando em um BaaS multi-tenant para a área da
-          saúde, com integrações de PIX e crédito (CCB).
+          Developer na Petize, criando e mantendo sistemas em Java e Spring
+          Boot para o mercado financeiro, a gestão de aluguel por temporada e a
+          assinatura eletrônica de documentos.
         </p>
 
         <div class="hero__actions">
@@ -86,7 +87,7 @@ const mailto = `mailto:${CONTACT.email}`
             <span class="terminal__typed">whoami</span>
           </p>
           <div class="terminal__out">
-            <p class="terminal__who">
+            <p class="terminal__who terminal__line" style="--i: 0">
               <img
                 src="https://github.com/olavomoreirap.png?size=96"
                 alt=""
@@ -98,19 +99,19 @@ const mailto = `mailto:${CONTACT.email}`
               <span>olavo moreira</span>
             </p>
             <dl>
-              <div>
+              <div class="terminal__line" style="--i: 1">
                 <dt>cargo</dt>
-                <dd>backend developer</dd>
+                <dd>full stack developer</dd>
               </div>
-              <div>
+              <div class="terminal__line" style="--i: 2">
                 <dt>stack</dt>
                 <dd>java, spring boot</dd>
               </div>
-              <div>
+              <div class="terminal__line" style="--i: 3">
                 <dt>agora</dt>
-                <dd>trainee @ petize</dd>
+                <dd>developer @ petize</dd>
               </div>
-              <div>
+              <div class="terminal__line" style="--i: 4">
                 <dt>escreve</dt>
                 <dd>
                   <a href="/blog">estudos sobre o ecossistema java</a>
@@ -208,7 +209,7 @@ const mailto = `mailto:${CONTACT.email}`
         <span class="contact__prompt" aria-hidden="true">$</span> ./contato.sh
       </h2>
       <p>
-        Procurando alguém para backend com Java e Spring Boot, ou quer trocar
+        Procurando alguém full stack, forte em Java e Spring Boot, ou quer trocar
         uma ideia sobre algum estudo? Respondo por e-mail ou LinkedIn.
       </p>
       <div class="hero__actions">
@@ -547,7 +548,34 @@ const mailto = `mailto:${CONTACT.email}`
 
   .terminal__out {
     margin-top: 1rem;
-    animation: fade-in var(--dur-base) var(--ease-out) var(--out-start) 1 both;
+  }
+  /*
+   * A saída do whoami chega linha a linha, cada uma "sintonizando" com um
+   * glitch curto: fatias deslocadas + separação RGB, depois assenta.
+   * Fill backwards (não both): esconde a linha durante o delay e, ao acabar,
+   * solta o estilo, para o brilho de fósforo herdado voltar intacto.
+   */
+  .terminal__line {
+    animation: line-glitch 460ms steps(1, end)
+      calc(var(--out-start) + var(--i, 0) * 180ms) 1 backwards;
+  }
+  @keyframes line-glitch {
+    0% { opacity: 0; }
+    12% {
+      opacity: 1;
+      clip-path: inset(0 0 55% 0);
+      transform: translateX(-6px);
+      text-shadow: 3px 0 var(--magenta), -3px 0 var(--cyan);
+    }
+    30% { clip-path: inset(45% 0 0 0); transform: translateX(5px); }
+    48% { opacity: 0.35; clip-path: inset(0 0 0 35%); transform: translateX(-3px); }
+    66% { opacity: 1; clip-path: inset(20% 0 30% 0); transform: translateX(2px); }
+    82% {
+      clip-path: inset(0);
+      transform: none;
+      text-shadow: 1px 0 var(--magenta), -1px 0 var(--cyan);
+    }
+    100% { opacity: 1; clip-path: none; transform: none; }
   }
   .terminal__who {
     display: flex;
@@ -587,10 +615,6 @@ const mailto = `mailto:${CONTACT.email}`
   .terminal dd a:hover {
     text-decoration-color: var(--magenta);
   }
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: none; }
-  }
 
   /*
    * Sem loops, flicker nem varredura: tudo aparece pronto e parado.
@@ -603,7 +627,7 @@ const mailto = `mailto:${CONTACT.email}`
     .terminal,
     .terminal::before,
     .terminal__typed,
-    .terminal__out {
+    .terminal__line {
       animation: none !important;
     }
     .terminal::before {
