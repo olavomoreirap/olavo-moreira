@@ -1,6 +1,4 @@
 ---
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
 import type { MarkdownHeading } from 'astro'
 import { Icon } from 'astro-icon/components'
 
@@ -9,61 +7,36 @@ type Props = {
 }
 
 const { headings } = Astro.props
-
-function getHeadingMargin(depth: number): string {
-  const margins: Record<number, string> = {
-    3: 'ml-4',
-    4: 'ml-8',
-    5: 'ml-12',
-    6: 'ml-16',
-  }
-  return margins[depth] || ''
-}
+const minDepth = Math.min(...headings.map(({ depth }) => depth))
 ---
 
 <details
   open
-  class="group col-start-2 rounded-xl border p-4 xl:sticky xl:top-20 xl:col-start-1 xl:mr-8 xl:ml-auto xl:h-[calc(100vh-5rem)] xl:max-w-fit xl:rounded-none xl:border-none xl:p-0"
+  class="toc group col-start-2 xl:sticky xl:top-20 xl:col-start-1 xl:mr-10 xl:ml-auto xl:h-[calc(100vh-6rem)] xl:w-56"
 >
-  <summary
-    class="flex cursor-pointer items-center justify-between text-xl font-medium group-open:pb-4 xl:hidden"
-  >
-    <span>Table of Contents</span>
+  <summary class="toc__summary">
+    <span>Sumário</span>
     <Icon
       name="lucide:chevron-down"
-      class="size-5 shrink-0 transition-transform group-open:rotate-180"
+      class="size-4 shrink-0 transition-transform group-open:rotate-180"
+      aria-hidden="true"
     />
   </summary>
 
-  <ScrollArea
-    client:load
-    className="flex max-h-64 flex-col overflow-y-auto xl:max-h-[calc(100vh-8rem)]"
-    type="always"
-  >
-    <ul
-      class="flex list-none flex-col gap-y-2 px-4 xl:mr-8"
-      id="table-of-contents"
-    >
-      <li class="hidden text-lg font-medium xl:block">Table of Contents</li>
+  <nav aria-label="Sumário" class="toc__nav">
+    <p class="toc__heading hidden xl:block" aria-hidden="true">Sumário</p>
+    <ul id="table-of-contents" class="toc__list">
       {
         headings.map((heading) => (
-          <li
-            class={cn(
-              'text-foreground/60 px-4 text-sm xl:p-0',
-              getHeadingMargin(heading.depth),
-            )}
-          >
-            <a
-              href={`#${heading.slug}`}
-              class="marker:text-foreground/30 list-item list-disc underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit xl:list-none"
-            >
+          <li style={`--depth: ${heading.depth - minDepth}`}>
+            <a href={`#${heading.slug}`} class="toc__link">
               {heading.text}
             </a>
           </li>
         ))
       }
     </ul>
-  </ScrollArea>
+  </nav>
 </details>
 
 <script>
@@ -79,12 +52,9 @@ function getHeadingMargin(depth: number): string {
 
           const id = heading.getAttribute('id')
           const link = document.querySelector(
-            `#table-of-contents li a[href="#${id}"]`,
+            `#table-of-contents a[href="#${id}"]`,
           )
-          if (!link) return
-
-          const addRemove = section.isIntersecting ? 'add' : 'remove'
-          link.classList[addRemove]('text-foreground')
+          link?.classList.toggle('is-active', section.isIntersecting)
         })
       },
       {
@@ -92,12 +62,105 @@ function getHeadingMargin(depth: number): string {
       },
     )
 
-    const sections = document.querySelectorAll('.prose section')
-    sections.forEach((section) => {
+    document.querySelectorAll('.prose section').forEach((section) => {
       observer.observe(section)
     })
   }
 
+  // No xl o sumário é coluna fixa e o <summary> some: se o usuário fechou no
+  // mobile e alargou a janela, reabre para não sumir com a navegação inteira
+  const xlQuery = window.matchMedia('(min-width: 1280px)')
+  function keepTocOpenOnXl() {
+    const toc = document.querySelector<HTMLDetailsElement>('details.toc')
+    if (toc && xlQuery.matches) toc.open = true
+  }
+  xlQuery.addEventListener('change', keepTocOpenOnXl)
+  document.addEventListener('astro:page-load', keepTocOpenOnXl)
+
   document.addEventListener('astro:page-load', setupToc)
-  document.addEventListener('astro:after-swap', setupToc)
 </script>
+
+<style>
+  .toc {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  @media (min-width: 1280px) {
+    .toc {
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+  }
+
+  .toc__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  .toc__summary::-webkit-details-marker {
+    display: none;
+  }
+  .toc[open] .toc__summary {
+    padding-bottom: 0.75rem;
+  }
+  /* No xl o sumário vira coluna lateral fixa: sem botão de abrir/fechar */
+  @media (min-width: 1280px) {
+    .toc__summary {
+      display: none;
+    }
+  }
+
+  .toc__nav {
+    max-height: 16rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  @media (min-width: 1280px) {
+    .toc__nav {
+      max-height: 100%;
+    }
+  }
+
+  .toc__heading {
+    margin-bottom: 0.75rem;
+    color: var(--ink-dim);
+    font-size: 0.8125rem;
+  }
+
+  .toc__list {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--line);
+  }
+  .toc__list li {
+    padding-left: calc(var(--depth, 0) * 0.875rem);
+  }
+
+  .toc__link {
+    display: block;
+    margin-left: -1px;
+    padding: 0.3rem 0 0.3rem 0.875rem;
+    border-left: 2px solid transparent;
+    color: var(--ink-dim);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+  .toc__link:hover {
+    color: var(--ink);
+  }
+  .toc__link.is-active {
+    border-left-color: var(--magenta);
+    color: var(--ink);
+  }
+</style>

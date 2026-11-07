@@ -1,33 +1,74 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
-import { badgeVariants } from '@/components/ui/badge'
 import Layout from '@/layouts/Layout.astro'
 import { getSortedTags } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import { formatPostCount } from '@/lib/utils'
 
 const sortedTags = await getSortedTags()
 ---
 
 <Layout>
-  <PageHead slot="head" title="Tags" />
-  <Breadcrumbs items={[{ label: 'Tags', icon: 'lucide:tags' }]} />
+  <PageHead
+    slot="head"
+    title="Tags"
+    description="Todos os assuntos do blog, organizados por tag."
+  />
 
-  <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap gap-2">
-      {
-        sortedTags.map(({ tag, count }) => (
-          <Link
-            href={`/tags/${tag}`}
-            class={badgeVariants({ variant: 'secondary' })}
-          >
-            <Icon name="lucide:hash" class="size-3" />
-            {tag}
-            <span class="text-muted-foreground ml-1.5">({count})</span>
-          </Link>
-        ))
-      }
-    </div>
-  </div>
+  <header class="page-intro">
+    <p class="page-prompt" aria-hidden="true">ls ~/blog/tags</p>
+    <h1>Tags</h1>
+    <p>Todos os assuntos do blog. Escolha uma tag para ver os posts dela.</p>
+  </header>
+
+  <ul class="tag-cloud">
+    {
+      sortedTags.map(({ tag, count }) => (
+        <li>
+          <a href={`/tags/${tag}`} class="tag-cloud__link">
+            #{tag}
+            <span class="tag-cloud__count">
+              <span aria-hidden="true">{count}</span>
+              <span class="sr-only">{formatPostCount(count)}</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </Layout>
+
+<style>
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+  }
+
+  .tag-cloud__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+  .tag-cloud__link:hover,
+  .tag-cloud__link:focus-visible {
+    border-color: var(--magenta);
+    box-shadow: var(--glow-sm);
+    color: var(--ink);
+  }
+
+  .tag-cloud__count {
+    color: var(--cyan);
+    font-size: 0.75rem;
+  }
+</style>

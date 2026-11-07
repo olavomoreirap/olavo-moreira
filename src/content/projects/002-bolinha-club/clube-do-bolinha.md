@@ -4,6 +4,8 @@ description: 'SaaS para players de League of Legends criarem conta, acompanharem
 tags: ['SaaS', 'League of Legends', 'Valorant', 'Discord', 'Live Games']
 image: 'bolinhaclub.png'
 link: 'https://bolinha-club.squareweb.app/sorteios'
+featured: true
+order: 2
 ---
 
 ## Sobre

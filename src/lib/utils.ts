@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: Date) {
-  return Intl.DateTimeFormat('en-US', {
+  return Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -17,5 +17,10 @@ export function readingTime(html: string) {
   const textOnly = html.replace(/<[^>]+>/g, '')
   const wordCount = textOnly.split(/\s+/).length
   const readingTimeMinutes = (wordCount / 200 + 1).toFixed()
-  return `${readingTimeMinutes} min read`
+  return `${readingTimeMinutes} min de leitura`
+}
+
+/** "1 post" / "N posts" */
+export function formatPostCount(count: number): string {
+  return count === 1 ? '1 post' : `${count} posts`
 }

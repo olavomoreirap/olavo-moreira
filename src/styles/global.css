@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * Tema único synthwave escuro (docs/adr/0001). A variante `dark:` fica sempre
+ * ativa para que os componentes shadcn existentes mantenham o estilo escuro.
+ * Glossário dos tokens: docs/design/tokens.md
+ */
+@custom-variant dark (&);
 
 @theme inline {
   --font-sans:
@@ -9,6 +14,8 @@
   --font-mono:
     'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
+  --font-prose:
+    'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -33,6 +40,17 @@
 
   --color-border: var(--border);
   --color-ring: var(--ring);
+
+  /* Paleta synthwave nomeada */
+  --color-void: var(--void);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-dim: var(--ink-dim);
+  --color-magenta: var(--magenta);
+  --color-cyan: var(--cyan);
 }
 
 @font-face {
@@ -52,35 +70,69 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* Paleta base */
+  --void: #0e0a1f;
+  --surface: #181233;
+  --surface-2: #211a45;
+  --line: #3b2d66;
+  --ink: #eee8ff;
+  --ink-muted: #a89ccb;
+  --ink-dim: #8a7eb0;
+  --magenta: #ff5ad9;
+  --cyan: #62e6ea;
+
+  /* Mapeamento semântico (shadcn) */
+  --background: var(--void);
+  --foreground: var(--ink);
+  --primary: var(--magenta);
+  --primary-foreground: var(--void);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--surface-2);
+  --accent-foreground: var(--ink);
+  --destructive: #ff6b7a;
+  --border: var(--line);
+  --ring: var(--magenta);
+
+  --radius: 0.5rem;
+
+  /* Brilho */
+  --glow-sm:
+    0 0 0 1px color-mix(in oklab, var(--magenta) 60%, transparent),
+    0 0 16px -4px color-mix(in oklab, var(--magenta) 55%, transparent);
+  --glow-md:
+    0 0 0 1px var(--magenta),
+    0 0 28px -6px color-mix(in oklab, var(--magenta) 70%, transparent);
+
+  /* Movimento */
+  --dur-fast: 150ms;
+  --dur-base: 240ms;
+  --dur-slow: 600ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Períodos dos loops do hero (ADR-0009); reduced-motion desliga as animações */
+  --loop-glitch: 5s;
+  --loop-type: 8s;
+  --loop-sweep: 7s;
 }
 
-.dark {
-  --background: oklch(0.13 0.08 285); /* Deep Purple */
-  --foreground: oklch(0.95 0.02 300); /* Pinkish White */
-  --primary: oklch(0.7 0.2 320); /* Neon Pink/Magenta */
-  --primary-foreground: oklch(0.13 0.08 285);
-  --secondary: oklch(0.25 0.1 290); /* Dark Violet */
-  --secondary-foreground: oklch(0.95 0.02 300);
-  --muted: oklch(0.2 0.08 285);
-  --muted-foreground: oklch(0.7 0.1 300);
-  --accent: oklch(0.25 0.1 290);
-  --accent-foreground: oklch(0.95 0.02 300);
-  --destructive: oklch(0.6 0.2 20);
-  --border: oklch(0.4 0.15 300); /* Purple Glow Border */
-  --ring: oklch(0.6 0.2 320); /* Pink Ring */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer base {
@@ -93,30 +145,183 @@
   }
 
   html {
-    @apply bg-background text-foreground scheme-light;
-
-    &.dark {
-      @apply scheme-dark;
-    }
+    @apply bg-background text-foreground;
+    color-scheme: dark;
 
     ::-webkit-scrollbar {
       width: 10px;
     }
-    
+
     ::-webkit-scrollbar-track {
       @apply bg-background;
     }
-    
+
     ::-webkit-scrollbar-thumb {
-      @apply bg-muted rounded-full border-2 border-background;
+      @apply bg-muted border-background rounded-full border-2;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
       @apply bg-muted-foreground;
     }
   }
 
-  .disable-transitions * {
-    @apply transition-none!;
+  ::selection {
+    background: color-mix(in oklab, var(--magenta) 35%, transparent);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--magenta);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* CTA primário: magenta sólido com glow no hover/foco */
+  .btn-neon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: var(--radius);
+    background: var(--magenta);
+    color: var(--void);
+    font-weight: 600;
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+
+    &:hover,
+    &:focus-visible {
+      box-shadow: var(--glow-md);
+      transform: translateY(-1px);
+    }
+  }
+
+  /*
+   * Ação secundária: contorno discreto. No hover/foco, colchetes neon se
+   * abrem nos quatro cantos e a borda separa em ciano/magenta (aberração
+   * cromática). Os colchetes são 8 gradientes num único pseudo-elemento.
+   */
+  .btn-ghost {
+    --bracket: var(--cyan);
+    --bracket-arm: 0.6rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--ink);
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      text-shadow var(--dur-fast) var(--ease-out);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      opacity: 0;
+      pointer-events: none;
+      --stroke: linear-gradient(var(--bracket) 0 0);
+      background:
+        var(--stroke) top left / var(--bracket-arm) 2px,
+        var(--stroke) top left / 2px var(--bracket-arm),
+        var(--stroke) top right / var(--bracket-arm) 2px,
+        var(--stroke) top right / 2px var(--bracket-arm),
+        var(--stroke) bottom left / var(--bracket-arm) 2px,
+        var(--stroke) bottom left / 2px var(--bracket-arm),
+        var(--stroke) bottom right / var(--bracket-arm) 2px,
+        var(--stroke) bottom right / 2px var(--bracket-arm);
+      background-repeat: no-repeat;
+      filter: drop-shadow(0 0 4px var(--bracket));
+      transition:
+        inset var(--dur-base) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out);
+    }
+
+    &:hover,
+    &:focus-visible {
+      border-color: color-mix(in oklab, var(--ink) 70%, var(--line));
+      box-shadow:
+        -2px 0 0 0 var(--cyan),
+        2px 0 0 0 var(--magenta),
+        0 0 18px -4px color-mix(in oklab, var(--magenta) 55%, transparent);
+      text-shadow:
+        -1px 0 color-mix(in oklab, var(--cyan) 70%, transparent),
+        1px 0 color-mix(in oklab, var(--magenta) 70%, transparent);
+    }
+    &:hover::before,
+    &:focus-visible::before {
+      inset: -7px;
+      opacity: 1;
+    }
+  }
+}
+
+/*
+ * Padrões das páginas internas (blog, trilhas, tags, sobre, 404).
+ * A home tem layout próprio; estas classes dão às outras páginas o mesmo
+ * cabeçalho e o mesmo ritmo de listas.
+ */
+@layer components {
+  .page-intro {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+
+    & h1 {
+      color: var(--ink);
+      font-size: clamp(2rem, 1.4rem + 2.5vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.1;
+      text-wrap: balance;
+      text-shadow:
+        -1px 0 color-mix(in oklab, var(--cyan) 45%, transparent),
+        1px 0 color-mix(in oklab, var(--magenta) 45%, transparent);
+    }
+    & > p:not(.page-prompt) {
+      max-width: 40rem;
+      margin-top: 1rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+    }
+  }
+
+  /* Prompt de terminal antes do título: "$ ls ~/blog" */
+  .page-prompt {
+    margin-bottom: 0.75rem;
+    color: var(--ink-dim);
+    font-size: 0.875rem;
+
+    &::before {
+      content: '$ ';
+      color: var(--cyan);
+    }
+  }
+
+  /* Divisor de ano/grupo nas listas: rótulo seguido de uma linha */
+  .list-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--ink-dim);
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        color-mix(in oklab, var(--magenta) 45%, var(--line)),
+        transparent
+      );
+    }
   }
 }

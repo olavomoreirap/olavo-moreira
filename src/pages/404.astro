@@ -1,29 +1,79 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
-import { buttonVariants } from '@/components/ui/button'
 import Layout from '@/layouts/Layout.astro'
-import { cn } from '@/lib/utils'
 ---
 
 <Layout>
-  <PageHead slot="head" title="404" />
-  <Breadcrumbs items={[{ label: '???', icon: 'lucide:circle-help' }]} />
+  <PageHead
+    slot="head"
+    title="Página não encontrada"
+    description="O endereço acessado não existe neste site."
+  />
 
-  <section
-    class="flex flex-col items-center justify-center gap-y-4 text-center"
-  >
-    <div class="max-w-md">
-      <h1 class="mb-4 text-3xl font-medium">404: Page not found</h1>
-      <p class="prose">Oops! The page you're looking for doesn't exist.</p>
+  <section class="not-found">
+    <p class="not-found__code" aria-hidden="true">404</p>
+    <div class="not-found__terminal" aria-hidden="true">
+      <p><span class="text-cyan">$</span> cd ./pagina-procurada</p>
+      <p class="text-magenta">cd: no such file or directory</p>
     </div>
-    <Link
-      href="/"
-      class={cn(buttonVariants({ variant: 'outline' }), 'flex gap-x-1.5 group')}
-    >
-      <span class="transition-transform group-hover:-translate-x-1">&larr;</span
-      > Go to home page
-    </Link>
+    <h1>Página não encontrada</h1>
+    <p class="not-found__text">
+      O endereço pode ter mudado ou estar digitado errado. Os posts continuam no
+      blog e nas trilhas.
+    </p>
+    <div class="not-found__actions">
+      <a href="/" class="btn-neon">Voltar para o início</a>
+      <a href="/blog" class="btn-ghost">Ver o blog</a>
+    </div>
   </section>
 </Layout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    min-height: calc(100vh - 24rem);
+    padding-block: 2rem;
+  }
+
+  .not-found__code {
+    color: var(--ink);
+    font-size: clamp(5rem, 3rem + 10vw, 9rem);
+    font-weight: 800;
+    line-height: 1;
+    text-shadow:
+      -3px 0 color-mix(in oklab, var(--cyan) 60%, transparent),
+      3px 0 color-mix(in oklab, var(--magenta) 60%, transparent);
+  }
+
+  .not-found__terminal {
+    width: 100%;
+    max-width: 32rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+  }
+
+  .not-found h1 {
+    color: var(--ink);
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  .not-found__text {
+    max-width: 40rem;
+    color: var(--ink-muted);
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+</style>

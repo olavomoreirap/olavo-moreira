@@ -1,14 +1,11 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PostHead from '@/components/PostHead.astro'
 import PostNavigation from '@/components/PostNavigation.astro'
 import TableOfContents from '@/components/TableOfContents.astro'
-import { badgeVariants } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { BLOG_CATEGORIES } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
-import { getAdjacentPosts, getAllPosts, parseAuthors } from '@/lib/data-utils'
+import { getAdjacentPosts, getAllPosts } from '@/lib/data-utils'
 import { formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
@@ -23,130 +20,91 @@ export async function getStaticPaths() {
 }
 
 const post = Astro.props
-const currentPostId = Astro.params.id
+const { title, description, date, image, tags, category } = post.data
 const { Content, headings } = await render(post)
-const { next, prev } = await getAdjacentPosts(currentPostId)
-const authors = await parseAuthors(post.data.authors ?? [])
+const { next, prev } = await getAdjacentPosts(post.id)
+const categoryMeta = BLOG_CATEGORIES.find(({ id }) => id === category)
 ---
 
 <Layout isWide>
   <PostHead slot="head" post={post} />
-  <section
-    class="grid grid-cols-[minmax(0px,1fr)_min(calc(var(--breakpoint-md)-2rem),100%)_minmax(0px,1fr)] gap-y-6"
-  >
+
+  <!-- ADR-0004: barra de progresso de leitura, só CSS (scroll-driven) -->
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <div class="post-grid">
     <div class="col-start-2">
       <Breadcrumbs
         items={[
           { href: '/blog', label: 'Blog', icon: 'lucide:archive' },
-          { label: post.data.title, icon: 'lucide:file-text' },
+          { label: title, icon: 'lucide:file-text' },
         ]}
       />
     </div>
+
+    <header class="post-header col-start-2">
+      <p class="post-header__meta">
+        {
+          categoryMeta ? (
+            <a href={`/trilhas/${categoryMeta.id}`} class="post-header__category">
+              {categoryMeta.label}
+            </a>
+          ) : (
+            <span class="post-header__category">{category}</span>
+          )
+        }
+        <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        <span>{readingTime(post.body!)}</span>
+      </p>
+
+      <h1>{title}</h1>
+      <p class="post-header__lede">{description}</p>
+
+      {
+        tags && tags.length > 0 && (
+          <ul class="post-header__tags" aria-label="Tags">
+            {tags.map((tag) => (
+              <li>
+                <a href={`/tags/${tag}`}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
     {
-      post.data.image && (
-        <Image
-          src={post.data.image}
-          alt={post.data.title}
-          width={1200}
-          height={630}
-          class="col-span-full mx-auto w-full max-w-5xl object-cover"
-        />
+      image && (
+        <div class="post-cover col-start-2">
+          <Image
+            src={image}
+            alt=""
+            width={1200}
+            height={630}
+            class="h-full w-full object-cover"
+          />
+        </div>
       )
     }
-    <section class="col-start-2 flex flex-col gap-y-6 text-center">
-      <div class="flex flex-col">
-        <h1
-          class="mb-2 text-4xl leading-tight font-medium text-pretty sm:text-5xl"
-        >
-          {post.data.title}
-        </h1>
-
-        <div
-          class="text-muted-foreground mb-4 flex flex-wrap items-center justify-center gap-2 text-sm"
-        >
-          {
-            authors.length > 0 && (
-              <>
-                <div class="flex items-center gap-x-2">
-                  {authors.map((author) => (
-                    <div class="flex items-center gap-x-1.5">
-                      <Image
-                        src={author.avatar}
-                        alt={author.name}
-                        width={24}
-                        height={24}
-                        class="rounded-full"
-                      />
-                      {author.isRegistered ? (
-                        <Link
-                          href={`/authors/${author.id}`}
-                          underline
-                          class="text-foreground"
-                        >
-                          <span>{author.name}</span>
-                        </Link>
-                      ) : (
-                        <span>{author.name}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <Separator orientation="vertical" className="h-4!" />
-              </>
-            )
-          }
-          <div class="flex items-center gap-2">
-            <span>{formatDate(post.data.date)}</span>
-            <Separator orientation="vertical" className="h-4!" />
-            <span>{readingTime(post.body!)}</span>
-          </div>
-        </div>
-        <div class="flex flex-wrap justify-center gap-2">
-          {
-            post.data.tags && post.data.tags.length > 0 ? (
-              post.data.tags.map((tag) => (
-                <a
-                  href={`/tags/${tag}`}
-                  class={badgeVariants({ variant: 'secondary' })}
-                >
-                  <Icon name="lucide:hash" class="size-3" />
-                  {tag}
-                </a>
-              ))
-            ) : (
-              <span class="text-muted-foreground text-sm">
-                No tags available
-              </span>
-            )
-          }
-        </div>
-      </div>
-
-      <PostNavigation prevPost={prev} nextPost={next} />
-    </section>
 
     {headings.length > 0 && <TableOfContents headings={headings} />}
 
-    <article class="prose col-start-2 max-w-none">
+    <article class="prose col-start-2">
       <Content />
     </article>
 
     <PostNavigation prevPost={prev} nextPost={next} />
-  </section>
+  </div>
 
-  <Button
-    variant="outline"
-    size="icon"
-    className="group fixed right-8 bottom-8 z-50 hidden"
+  <button
+    type="button"
+    class="scroll-top btn-ghost hidden"
     id="scroll-to-top"
-    title="Scroll to top"
-    aria-label="Scroll to top"
+    aria-label="Voltar ao topo"
+    title="Voltar ao topo"
   >
-    <Icon
-      name="lucide:arrow-up"
-      class="mx-auto size-4 transition-all group-hover:-translate-y-0.5"
-    />
-  </Button>
+    <Icon name="lucide:arrow-up" class="size-4" aria-hidden="true" />
+  </button>
 
   <script>
     document.addEventListener('astro:page-load', () => {
@@ -155,8 +113,13 @@ const authors = await parseAuthors(post.data.authors ?? [])
 
       if (!scrollToTopButton || !footer) return
 
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
       const handleClick = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        window.scrollTo({
+          top: 0,
+          behavior: reducedMotion.matches ? 'auto' : 'smooth',
+        })
       }
 
       const handleScroll = () => {
@@ -182,3 +145,123 @@ const authors = await parseAuthors(post.data.authors ?? [])
     })
   </script>
 </Layout>
+
+<style>
+  .reading-progress {
+    display: none;
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    height: 3px;
+    background: linear-gradient(to right, var(--magenta), var(--cyan));
+    box-shadow: 0 0 10px color-mix(in oklab, var(--magenta) 70%, transparent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    pointer-events: none;
+  }
+  /* Sem suporte a scroll-driven animations, a barra simplesmente não aparece */
+  @supports (animation-timeline: scroll()) {
+    .reading-progress {
+      display: block;
+      animation: reading-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+  /* Barra presa ao scroll também é movimento: some com reduced-motion (ADR-0009) */
+  @media (prefers-reduced-motion: reduce) {
+    .reading-progress {
+      display: none;
+    }
+  }
+  @keyframes reading-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      min(46rem, 100%)
+      minmax(0, 1fr);
+    row-gap: 2rem;
+  }
+
+  .post-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    color: var(--ink-dim);
+    font-size: 0.875rem;
+  }
+  .post-header__category {
+    color: var(--ink-muted);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .post-header__category::before {
+    content: '';
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.5rem;
+    background: var(--magenta);
+    vertical-align: 0.05em;
+  }
+  a.post-header__category:hover {
+    color: var(--magenta);
+  }
+
+  .post-header h1 {
+    margin-top: 1rem;
+    color: var(--ink);
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.12;
+    text-wrap: balance;
+    text-shadow:
+      -1px 0 color-mix(in oklab, var(--cyan) 45%, transparent),
+      1px 0 color-mix(in oklab, var(--magenta) 45%, transparent);
+  }
+  .post-header__lede {
+    max-width: 60ch;
+    margin-top: 1rem;
+    color: var(--ink-muted);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  .post-header__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 1.25rem;
+    font-size: 0.8125rem;
+  }
+  .post-header__tags a {
+    color: var(--ink-dim);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .post-header__tags a:hover {
+    color: var(--magenta);
+  }
+
+  .post-cover {
+    aspect-ratio: 1200 / 630;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--void);
+  }
+
+  .scroll-top {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 50;
+    justify-content: center;
+    width: 2.75rem;
+    padding: 0;
+    background: var(--void);
+  }
+</style>

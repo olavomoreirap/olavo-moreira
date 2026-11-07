@@ -4,6 +4,8 @@ description: 'SaaS modular para a area publica com cotacao de precos, pesquisa d
 tags: ['SaaS', 'Licitacoes', 'Gestao de Contratos', 'Almoxarifado', 'WhatsApp']
 image: 'publico.png'
 link: 'https://stag-front-stag.up.railway.app/'
+featured: true
+order: 1
 ---
 
 ## Sobre

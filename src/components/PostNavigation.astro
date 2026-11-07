@@ -1,52 +1,97 @@
 ---
-import Link from '@/components/Link.astro'
-import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
 
+interface Props {
+  prevPost: CollectionEntry<'blog'> | null
+  nextPost: CollectionEntry<'blog'> | null
+}
+
+// prev = post mais antigo, next = post mais recente (ver getAdjacentPosts)
 const { prevPost, nextPost } = Astro.props
 ---
 
-<nav class="col-start-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <Link
-    href={nextPost ? `/blog/${nextPost.id}` : '#'}
-    class={cn(
-      buttonVariants({ variant: 'outline' }),
-      'rounded-xl group flex items-center justify-start size-full',
-      !nextPost && 'pointer-events-none opacity-50 cursor-not-allowed',
-    )}
-    aria-disabled={!nextPost}
-  >
-    <Icon
-      name="lucide:arrow-left"
-      class="mr-2 size-4 transition-transform group-hover:-translate-x-1"
-    />
-    <div class="flex flex-col items-start overflow-hidden text-wrap">
-      <span class="text-muted-foreground text-left text-xs">Next Post</span>
-      <span class="w-full text-left text-sm text-ellipsis">
-        {nextPost?.data.title || 'Latest post!'}
-      </span>
-    </div>
-  </Link>
-  <Link
-    href={prevPost ? `/blog/${prevPost.id}` : '#'}
-    class={cn(
-      buttonVariants({ variant: 'outline' }),
-      'rounded-xl group flex items-center justify-end size-full',
-      !prevPost && 'pointer-events-none opacity-50 cursor-not-allowed',
-    )}
-    aria-disabled={!prevPost}
-  >
-    <div class="flex flex-col items-end overflow-hidden text-wrap">
-      <span class="text-muted-foreground text-right text-xs">Previous Post</span
-      >
-      <span class="w-full text-right text-sm text-ellipsis">
-        {prevPost?.data.title || 'Last post!'}
-      </span>
-    </div>
-    <Icon
-      name="lucide:arrow-right"
-      class="ml-2 size-4 transition-transform group-hover:translate-x-1"
-    />
-  </Link>
-</nav>
+{
+  (prevPost || nextPost) && (
+    <nav class="post-nav col-start-2" aria-label="Outros posts">
+      {prevPost ? (
+        <a href={`/blog/${prevPost.id}`} class="post-nav__link" rel="prev">
+          <span class="post-nav__label">
+            <Icon name="lucide:arrow-left" class="size-3.5" aria-hidden="true" />
+            Post mais antigo
+          </span>
+          <span class="post-nav__title">{prevPost.data.title}</span>
+        </a>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+      {nextPost && (
+        <a
+          href={`/blog/${nextPost.id}`}
+          class="post-nav__link post-nav__link--next"
+          rel="next"
+        >
+          <span class="post-nav__label">
+            Post mais recente
+            <Icon name="lucide:arrow-right" class="size-3.5" aria-hidden="true" />
+          </span>
+          <span class="post-nav__title">{nextPost.data.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .post-nav {
+    display: grid;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 640px) {
+    .post-nav {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .post-nav__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+  .post-nav__link:hover,
+  .post-nav__link:focus-visible {
+    border-color: var(--magenta);
+    box-shadow: var(--glow-sm);
+  }
+  .post-nav__link--next {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .post-nav__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--ink-dim);
+    font-size: 0.75rem;
+  }
+  .post-nav__title {
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    text-wrap: balance;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .post-nav__link:hover .post-nav__title {
+    color: var(--magenta);
+  }
+</style>

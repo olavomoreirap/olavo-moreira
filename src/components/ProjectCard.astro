@@ -1,7 +1,6 @@
 ---
 import Link from '@/components/Link.astro'
 import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
@@ -12,93 +11,124 @@ interface Props {
 }
 
 const { project } = Astro.props
-const isSaaS = project.data.tags?.includes('SaaS')
+const { featured, image, name, description, startDate, endDate, tags, link } =
+  project.data
 const projectHref = `/projects/${project.id}`
 ---
 
-<div
-  class:list={[
-    'group relative rounded-xl border p-4 transition-all duration-300 ease-in-out hover:bg-secondary/50',
-    isSaaS &&
-      'ring-1 ring-primary/30 border-primary/40 bg-primary/5 shadow-[0_0_0_1px_rgba(168,85,247,0.15)]',
-  ]}
+<article
+  class:list={['project-card', featured && 'project-card--featured']}
 >
-  <div class="flex flex-col gap-4 lg:flex-row">
+  {
+    image && (
+      <Link
+        href={projectHref}
+        class="project-card__media"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <Image
+          src={image}
+          alt=""
+          width={1200}
+          height={630}
+          class="h-full w-full object-cover"
+        />
+      </Link>
+    )
+  }
+  <div class="flex grow flex-col gap-3 p-5">
+    <h3 class="text-ink text-lg font-medium">
+      <Link href={projectHref} class="project-card__title">{name}</Link>
+    </h3>
+    <p class="text-ink-muted line-clamp-3 text-sm leading-relaxed">
+      {description}
+    </p>
     {
-      project.data.image && (
-        <Link
-          href={projectHref}
-          class="w-full rounded-lg overflow-hidden border border-primary/10 bg-background/40 lg:max-w-3xs lg:shrink-0"
-        >
-          <Image
-            src={project.data.image}
-            alt={project.data.name}
-            width={1200}
-            height={630}
-            class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-          />
-        </Link>
+      startDate && (
+        <p class="text-ink-dim flex items-center gap-1.5 text-xs">
+          <Icon name="lucide:calendar" class="size-3" aria-hidden="true" />
+          {formatDate(startDate)} até{' '}
+          {endDate ? formatDate(endDate) : 'hoje'}
+        </p>
       )
     }
-    <div class="grow min-w-0">
-      {
-        isSaaS && (
-          <div class="mb-2 flex items-center gap-2 text-xs">
-            <Badge className="border border-primary/30 bg-primary/15 text-primary">
-              SaaS
-            </Badge>
-            <span class="rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary/80">
-              Destaque
-            </span>
-          </div>
-        )
-      }
-      <h3 class="mb-1 text-lg font-medium transition-colors group-hover:text-primary">
-        <Link href={projectHref} class="hover:text-primary">
-          {project.data.name}
-        </Link>
-      </h3>
-      <p class="text-muted-foreground mb-2 text-sm line-clamp-3">
-        {project.data.description}
-      </p>
-      {
-        project.data.startDate && (
-          <p class="text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs">
-            <span class="flex items-center gap-x-1.5">
-              <Icon name="lucide:calendar" class="size-3" />
-              <span>
-                {formatDate(project.data.startDate)}
-                {project.data.endDate
-                  ? ` → ${formatDate(project.data.endDate)}`
-                  : ' → Present'}
-              </span>
-            </span>
-          </p>
-        )
-      }
-      {
-        project.data.tags && (
-          <div class="flex flex-wrap gap-2">
-            {project.data.tags.map((tag: string) => (
+    {
+      tags.length > 0 && (
+        <ul class="flex flex-wrap gap-1.5" aria-label="Tecnologias e temas">
+          {tags.map((tag: string) => (
+            <li>
               <Badge variant="secondary" className="max-w-full whitespace-normal">
                 {tag}
               </Badge>
-            ))}
-          </div>
-        )
-      }
-      <div class="mt-4 flex flex-wrap gap-2">
-        <Link href={projectHref} class={buttonVariants({ size: 'sm' })}>
-          Ler mais
-        </Link>
-        <Link
-          href={project.data.link}
-          external
-          class={buttonVariants({ variant: 'outline', size: 'sm' })}
-        >
-          Abrir projeto
-        </Link>
-      </div>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <div class="mt-auto flex flex-wrap gap-4 pt-2 text-sm">
+      <Link href={projectHref} class="text-magenta" underline>
+        Ler sobre o projeto
+      </Link>
+      <Link href={link} external class="text-ink-muted" underline>
+        Abrir projeto
+        <span class="sr-only">(abre em nova aba)</span>
+      </Link>
     </div>
   </div>
-</div>
+</article>
+
+<style>
+  .project-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out);
+  }
+  .project-card--featured {
+    border-color: color-mix(in oklab, var(--magenta) 35%, var(--line));
+  }
+  .project-card:hover,
+  .project-card:focus-within {
+    border-color: var(--magenta);
+    box-shadow: var(--glow-sm);
+  }
+
+  .project-card__media {
+    aspect-ratio: 1200 / 630;
+    border-bottom: 1px solid var(--line);
+    background: var(--void);
+    overflow: hidden;
+  }
+  .project-card__media :global(img) {
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .project-card:hover .project-card__media :global(img) {
+    transform: scale(1.03);
+  }
+
+  /* O título cobre o card inteiro como área clicável */
+  .project-card__title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .project-card__title:focus-visible {
+    outline: none;
+  }
+  .project-card:has(.project-card__title:focus-visible) {
+    outline: 2px solid var(--magenta);
+    outline-offset: 3px;
+  }
+  /* Links secundários ficam acima da área clicável do título */
+  .project-card :global(a:not(.project-card__title)) {
+    position: relative;
+    z-index: 1;
+  }
+</style>
