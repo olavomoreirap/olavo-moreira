@@ -1,61 +1,53 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
 import Layout from '@/layouts/Layout.astro'
-import { getAllProjects } from '@/lib/data-utils'
+import { getAllProjects, getFeaturedProjects } from '@/lib/data-utils'
 
-const projects = await getAllProjects()
-const featuredProjects = projects.filter((project) =>
-  project.data.tags?.includes('SaaS'),
-)
-const otherProjects = projects.filter(
-  (project) => !project.data.tags?.includes('SaaS'),
-)
+const [projects, featuredProjects] = await Promise.all([
+  getAllProjects(),
+  getFeaturedProjects(),
+])
+const otherProjects = projects.filter((project) => !project.data.featured)
 ---
 
 <Layout isWide>
   <PageHead slot="head" title="Sobre" />
-  <div class="mx-auto w-full max-w-5xl flex flex-col gap-y-6">
-    <Breadcrumbs items={[{ label: 'Sobre', icon: 'lucide:info' }]} />
+  <div class="mx-auto flex w-full max-w-5xl flex-col gap-y-12">
+    <header class="page-intro">
+      <p class="page-prompt" aria-hidden="true">cat ~/sobre.md</p>
+      <h1>Sobre</h1>
+      <p>
+        Sou desenvolvedor backend com foco em Java e produtos SaaS. Aqui
+        compartilho estudos e aplico o que estou construindo em projetos reais.
+      </p>
+    </header>
 
-    <section class="space-y-10">
-      <div class="min-w-full">
-        <div class="prose">
-          <h1>Sobre</h1>
-          <p>
-            Sou desenvolvedor backend com foco em Java e produtos SaaS. Aqui
-            compartilho estudos e aplico o que estou construindo em projetos reais.
-          </p>
-        </div>
+    <section aria-labelledby="projetos-destaque" class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <h2 id="projetos-destaque" class="list-divider">Projetos em destaque</h2>
+        <p class="text-ink-muted text-sm">
+          SaaS que estou construindo e evoluindo agora.
+        </p>
       </div>
-
-      <div>
-        <div class="mb-4">
-          <h2 class="text-2xl font-medium">Projetos em destaque</h2>
-          <p class="text-sm text-muted-foreground">
-            SaaS que estou construindo e evoluindo agora.
-          </p>
-        </div>
-        <div class="grid gap-4 md:grid-cols-2">
-          {featuredProjects.map((project) => (
-            <ProjectCard project={project} />
-          ))}
-        </div>
+      <div class="grid gap-4 md:grid-cols-2">
+        {featuredProjects.map((project) => <ProjectCard project={project} />)}
       </div>
-
-      {
-        otherProjects.length > 0 && (
-          <div>
-            <h3 class="mb-4 text-lg font-medium">Outros projetos</h3>
-            <div class="flex flex-col gap-4">
-              {otherProjects.map((project) => (
-                <ProjectCard project={project} />
-              ))}
-            </div>
-          </div>
-        )
-      }
     </section>
+
+    {
+      otherProjects.length > 0 && (
+        <section aria-labelledby="outros-projetos" class="flex flex-col gap-6">
+          <h2 id="outros-projetos" class="list-divider">
+            Outros projetos
+          </h2>
+          <div class="grid gap-4 md:grid-cols-2">
+            {otherProjects.map((project) => (
+              <ProjectCard project={project} />
+            ))}
+          </div>
+        </section>
+      )
+    }
   </div>
 </Layout>

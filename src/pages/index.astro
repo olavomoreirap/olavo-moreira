@@ -2,183 +2,752 @@
 import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
-import { SITE } from '@/consts'
+import { CONTACT, SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
-import { getAllCategories, getAllProjects, getRecentPosts } from '@/lib/data-utils'
-import { buttonVariants } from '@/components/ui/button'
-import { Icon } from 'astro-icon/components'
+import {
+  getAllCategories,
+  getFeaturedProjects,
+  getRecentPosts,
+} from '@/lib/data-utils'
+import { formatDate } from '@/lib/utils'
 
-const [blog, projects, categories] = await Promise.all([
-  getRecentPosts(SITE.featuredPostCount),
-  getAllProjects(),
+const [recentPosts, featuredProjects, categories] = await Promise.all([
+  getRecentPosts(4),
+  getFeaturedProjects(),
   getAllCategories(),
 ])
-const featuredProjects = projects
-  .filter((project) => project.data.tags?.includes('SaaS'))
-  .slice(0, 2)
+
+const mailto = `mailto:${CONTACT.email}`
 ---
 
 <Layout isWide>
-  <PageHead slot="head" title="Home" />
-  
-  <div class="p-4 md:p-8 max-w-7xl mx-auto space-y-4">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      
-      <!-- HERO CARD (Top Left - 2 Cols) -->
-      <div class="col-span-1 md:col-span-2 rounded-3xl border border-primary/20 bg-secondary/30 p-8 backdrop-blur-md relative overflow-hidden group">
-        <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl group-hover:bg-primary/20 transition-all duration-700"></div>
-        <div class="relative z-10 flex flex-col justify-between h-full">
-          <div>
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
-              Hey, I'm <span class="text-primary">Olavo</span>!
-            </h1>
-            <p class="font-medium mb-4 leading-relaxed">
-              Backend Software Engineer | Fintech & Financial Services | Java • Spring Boot
-            </p>
-            <p class="text-base text-muted-foreground mb-4 leading-relaxed">
-              Este blog nasceu da minha vontade de documentar meus estudos sobre Spring Boot e o ecossistema Java, compartilhando os estudos que eu fiz durante minha jornada como desenvolvedor até meu primeiro emprego na área.
-            </p>
-            <p class="text-base text-muted-foreground mb-4 leading-relaxed">
-              Meu principal intuito é <strong>desmistificar a linguagem</strong>.
-            </p>
+  <PageHead slot="head" title="Home" description={SITE.description} />
 
-            <p class="text-base text-muted-foreground mb-8 leading-relaxed">
-              Sei que muitos desenvolvedores que estão começando sentem receio da verbosidade ou da complexidade do Java, por isso, foco em criar conteúdos que facilitem essa curva de aprendizado.
-            </p>
-
-          </div>
-          
-          <div class="flex gap-4 mt-auto">
-             <Link href="/blog" class={buttonVariants({ variant: 'default' })}>
-               Ler Blog
-             </Link>
-             <Link href="https://github.com/olavomoreirap" class={buttonVariants({ variant: 'outline' })}>
-               GitHub
-             </Link>
-          </div>
-        </div>
-      </div>
-
-      <!-- PROFILE CARD (Top Right - 1 Col) -->
-      <div class="col-span-1 rounded-3xl border border-primary/20 bg-secondary/30 p-6 backdrop-blur-md flex flex-col items-center justify-center text-center relative overflow-hidden group">
-         <div class="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-         
-         <div class="relative h-32 w-32 mb-4 rounded-full border-4 border-primary/20 p-1 group-hover:border-primary/50 transition-colors duration-300">
-            <img 
-              src="https://github.com/olavomoreirap.png" 
-              alt="Olavo Moreira" 
-              class="rounded-full w-full h-full object-cover bg-background"
-              loading="lazy"
-            />
-         </div>
-         
-         <h2 class="text-xl font-bold">Olavo Moreira</h2>
-         <p class="text-sm text-primary/80 font-mono mb-4">@olavomoreirap</p>
-         
-         <div class="flex gap-3 text-2xl">
-            <!-- Social Icons placeholder - could be components -->
-            <Link href="https://github.com/olavomoreirap" class="text-muted-foreground hover:text-primary transition-colors">
-              <span class="sr-only">GitHub</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.5-1 .5-2 .5-2 0-2-1.5-3.5-1.5-3.5-4 .5-6 3.5-6 3.5s-2-3.5-6-3.5-1.5 3.5-1.5 3.5c0 0 0 1 .5 2-1.5 1-1.5 2.5-1.5 2.5 0 3.5 3 5.5 6 5.5-.5 1-.5 2.5-.5 2.5V22"/></svg>
-            </Link>
-            <Link href="https://linkedin.com/in/olavomoreira" class="text-muted-foreground hover:text-primary transition-colors">
-              <span class="sr-only">LinkedIn</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-            </Link>
-         </div>
-      </div>
-
-      <!-- LATEST POSTS (Middle Right - 2 Cols) -->
-      <div class="col-span-1 md:col-span-3 rounded-3xl border border-primary/20 bg-secondary/30 p-6 backdrop-blur-md relative overflow-hidden flex flex-col">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="font-bold text-lg flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-            Latest Logs
-          </h3>
-          <Link href="/blog" class="text-xs text-primary hover:underline underline-offset-4">View all &rarr;</Link>
-        </div>
-        
-        <div class="grid gap-3 flex-1">
-          {blog.slice(0, 3).map((post) => (
-            <Link href={`/blog/${post.id}`} class="block group">
-              <div class="p-3 rounded-xl bg-background/40 hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all duration-300 flex justify-between items-center">
-                 <div>
-                   <h4 class="font-medium text-sm group-hover:text-primary transition-colors line-clamp-1">{post.data.title}</h4>
-                   <p class="text-xs text-muted-foreground mt-1">{post.data.date.toLocaleDateString()}</p>
-                 </div>
-                 <div class="opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {
-        featuredProjects.length > 0 && (
-          <div class="col-span-1 md:col-span-3 rounded-3xl border border-primary/20 bg-secondary/30 p-6 backdrop-blur-md relative overflow-hidden">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="font-bold text-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-                Projetos em destaque
-              </h3>
-              <Link href="/about" class="text-xs text-primary hover:underline underline-offset-4">Ver todos &rarr;</Link>
-            </div>
-            <div class="grid gap-4 md:grid-cols-2">
-              {featuredProjects.map((project) => (
-                <ProjectCard project={project} />
-              ))}
-            </div>
-          </div>
-        )
-      }
-
-      {
-        categories.length > 0 && (
-          <div class="col-span-1 md:col-span-3 rounded-3xl border border-primary/20 bg-secondary/30 p-6 backdrop-blur-md relative overflow-hidden">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="font-bold text-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M12 11v6"/><path d="M8 19h8"/></svg>
-                Trilhas de estudo
-              </h3>
-              <Link href="/trilhas" class="text-xs text-primary hover:underline underline-offset-4">Ver todas &rarr;</Link>
-            </div>
-            <div class="grid gap-4 md:grid-cols-2">
-              {categories.map((category) => (
-                <Link
-                  href={`/trilhas/${category.id}`}
-                  class="group relative rounded-2xl border border-primary/15 bg-background/40 p-5 transition-all duration-300 hover:border-primary/40 hover:bg-background/60 overflow-hidden"
-                >
-                  <div
-                    class={`pointer-events-none absolute inset-0 bg-gradient-to-br ${category.accent} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
-                  ></div>
-                  <div class="relative flex h-full flex-col gap-3">
-                    <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                      <Icon name={category.icon} class="size-4 text-primary" />
-                      Trilha
-                    </div>
-                    <div>
-                      <h4 class="text-lg font-medium group-hover:text-primary transition-colors">
-                        {category.label}
-                      </h4>
-                      <p class="text-xs text-muted-foreground mt-2">
-                        {category.description}
-                      </p>
-                    </div>
-                    <div class="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{category.count} estudos</span>
-                      <span class="text-primary">Abrir trilha →</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )
-      }
-
+  <!-- Hero -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__backdrop" aria-hidden="true">
+      <div class="hero__horizon"></div>
+      <div class="hero__scanlines"></div>
     </div>
+
+    <div class="hero__inner">
+      <div class="hero__intro">
+        <p class="status-badge">
+          <span class="status-badge__dot" aria-hidden="true"></span>
+          Aberto a conversas
+        </p>
+
+        <h1 id="hero-title" class="glitch" data-text={SITE.author}>
+          {SITE.author}
+        </h1>
+
+        <p class="hero__role">Backend Developer · Java &amp; Spring Boot</p>
+
+        <p class="hero__proof">
+          Trainee na Petize, trabalhando em um BaaS multi-tenant para a área da
+          saúde, com integrações de PIX e crédito (CCB).
+        </p>
+
+        <div class="hero__actions">
+          <a href={mailto} class="btn-neon">Falar comigo</a>
+          <button
+            type="button"
+            class="btn-ghost copy-email"
+            data-copy-email={CONTACT.email}
+          >
+            Copiar e-mail
+          </button>
+          <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" class="btn-ghost">
+            LinkedIn <span class="sr-only">(abre em nova aba)</span>
+          </a>
+          <a href={CONTACT.github} target="_blank" rel="noopener noreferrer" class="btn-ghost">
+            GitHub <span class="sr-only">(abre em nova aba)</span>
+          </a>
+          {
+            CONTACT.cvHref && (
+              <a href={CONTACT.cvHref} class="btn-ghost" download>
+                Baixar CV
+              </a>
+            )
+          }
+        </div>
+        <p class="copy-feedback" aria-live="polite" data-copy-feedback></p>
+      </div>
+
+      <!-- Card-terminal CRT: HTML real; liga com flicker e redigita o comando em loop -->
+      <figure class="terminal" aria-label="Resumo em formato de terminal">
+        <div class="terminal__bar" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <p>~/olavo</p>
+        </div>
+        <div class="terminal__body">
+          <p class="terminal__cmd">
+            <span class="terminal__prompt" aria-hidden="true">$</span>
+            <span class="terminal__typed">whoami</span>
+          </p>
+          <div class="terminal__out">
+            <p class="terminal__who">
+              <img
+                src="https://github.com/olavomoreirap.png?size=96"
+                alt=""
+                width="40"
+                height="40"
+                decoding="async"
+                fetchpriority="low"
+              />
+              <span>olavo moreira</span>
+            </p>
+            <dl>
+              <div>
+                <dt>cargo</dt>
+                <dd>backend developer</dd>
+              </div>
+              <div>
+                <dt>stack</dt>
+                <dd>java, spring boot</dd>
+              </div>
+              <div>
+                <dt>agora</dt>
+                <dd>trainee @ petize</dd>
+              </div>
+              <div>
+                <dt>escreve</dt>
+                <dd>
+                  <a href="/blog">estudos sobre o ecossistema java</a>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <div class="home-sections">
+    <!-- Projetos em destaque -->
+    {
+      featuredProjects.length > 0 && (
+        <section aria-labelledby="projetos-title" class="home-section">
+          <header class="section-head">
+            <h2 id="projetos-title">Projetos em destaque</h2>
+            <Link href="/about" class="section-head__more" underline>
+              Ver todos os projetos
+            </Link>
+          </header>
+          <div class="projects-grid">
+            {featuredProjects.map((project) => (
+              <ProjectCard project={project} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Trilhas + últimos posts, lado a lado no desktop -->
+    <div class="reading-grid">
+      <section aria-labelledby="trilhas-title" class="home-section">
+        <header class="section-head">
+          <h2 id="trilhas-title">Trilhas de estudo</h2>
+          <Link href="/trilhas" class="section-head__more" underline>
+            Ver trilhas
+          </Link>
+        </header>
+        <p class="section-lede">
+          Meu objetivo é desmistificar o Java para quem está começando: cada
+          trilha reúne os estudos em uma ordem que facilita a curva de
+          aprendizado.
+        </p>
+        <ul class="entry-list">
+          {
+            categories.map((category) => (
+              <li>
+                <a href={`/trilhas/${category.id}`} class="entry">
+                  <span class="entry__title">{category.label}</span>
+                  <span class="entry__meta">
+                    {category.count}{' '}
+                    {category.count === 1 ? 'estudo' : 'estudos'}
+                  </span>
+                  <span class="entry__desc">{category.description}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="posts-title" class="home-section">
+        <header class="section-head">
+          <h2 id="posts-title">Últimos posts</h2>
+          <Link href="/blog" class="section-head__more" underline>
+            Ver blog
+          </Link>
+        </header>
+        <ul class="entry-list">
+          {
+            recentPosts.map((post) => (
+              <li>
+                <a href={`/blog/${post.id}`} class="entry">
+                  <span class="entry__title">{post.data.title}</span>
+                  <time
+                    class="entry__meta"
+                    datetime={post.data.date.toISOString()}
+                  >
+                    {formatDate(post.data.date)}
+                  </time>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <!-- CTA final -->
+    <section id="contato" aria-labelledby="contato-title" class="contact">
+      <h2 id="contato-title">
+        <span class="contact__prompt" aria-hidden="true">$</span> ./contato.sh
+      </h2>
+      <p>
+        Procurando alguém para backend com Java e Spring Boot, ou quer trocar
+        uma ideia sobre algum estudo? Respondo por e-mail ou LinkedIn.
+      </p>
+      <div class="hero__actions">
+        <a href={mailto} class="btn-neon">Falar comigo</a>
+        <button
+          type="button"
+          class="btn-ghost copy-email"
+          data-copy-email={CONTACT.email}
+        >
+          Copiar e-mail
+        </button>
+        <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" class="btn-ghost">
+            LinkedIn <span class="sr-only">(abre em nova aba)</span>
+          </a>
+      </div>
+      <p class="copy-feedback" aria-live="polite" data-copy-feedback></p>
+    </section>
   </div>
 </Layout>
 
+<script>
+  // Copiar e-mail: delegado no document para cobrir hero e CTA final.
+  document.addEventListener('click', async (event) => {
+    const button = (event.target as Element | null)?.closest<HTMLElement>(
+      '[data-copy-email]',
+    )
+    if (!button) return
+
+    const email = button.dataset.copyEmail ?? ''
+    const feedback = button
+      .closest('.hero__intro, .contact')
+      ?.querySelector<HTMLElement>('[data-copy-feedback]')
+
+    try {
+      await navigator.clipboard.writeText(email)
+      if (feedback) feedback.textContent = 'E-mail copiado'
+    } catch {
+      if (feedback) feedback.textContent = `Não foi possível copiar: ${email}`
+    }
+    if (!feedback) return
+    window.clearTimeout(Number(feedback.dataset.timer))
+    feedback.dataset.timer = String(
+      window.setTimeout(() => {
+        feedback.textContent = ''
+      }, 4000),
+    )
+  })
+</script>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin-inline: -1rem;
+    margin-top: -1.5rem;
+    padding: 3.5rem 1rem 4rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Grid de horizonte em perspectiva, estático */
+  .hero__horizon {
+    position: absolute;
+    inset: 45% -25% -10%;
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--magenta) 28%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--magenta) 28%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 56px 56px;
+    transform: perspective(420px) rotateX(62deg);
+    transform-origin: center top;
+    mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+    opacity: 0.55;
+  }
+  .hero__horizon::before {
+    content: '';
+    position: absolute;
+    inset: -2px 0 auto;
+    height: 2px;
+    background: var(--magenta);
+    box-shadow: 0 0 24px 4px color-mix(in oklab, var(--magenta) 60%, transparent);
+  }
+
+  .hero__scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0 2px,
+      color-mix(in oklab, var(--void) 55%, transparent) 2px 3px
+    );
+    opacity: 0.35;
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: 2.5rem;
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 960px) {
+    .hero {
+      padding-block: 6rem 6.5rem;
+    }
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      align-items: center;
+      gap: 4rem;
+    }
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--cyan) 45%, var(--line));
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--void) 70%, transparent);
+    color: var(--cyan);
+    font-size: 0.8125rem;
+  }
+  .status-badge__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* Nome com glitch em rajadas: ~0,3 s de falha a cada 5 s */
+  .glitch {
+    position: relative;
+    margin-top: 1.25rem;
+    color: var(--ink);
+    font-size: clamp(2.25rem, 1.4rem + 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    text-shadow: 0 0 32px color-mix(in oklab, var(--magenta) 35%, transparent);
+  }
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    /* Texto alternativo vazio: leitor de tela não anuncia o nome 3 vezes */
+    content: attr(data-text) / '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    text-shadow: none;
+    pointer-events: none;
+  }
+  /* steps(1, end): cada quadro segura o valor e salta, sem interpolar */
+  .glitch::before {
+    color: var(--magenta);
+    animation: glitch-magenta var(--loop-glitch) steps(1, end) 300ms infinite backwards;
+  }
+  .glitch::after {
+    color: var(--cyan);
+    animation: glitch-cyan var(--loop-glitch) steps(1, end) 340ms infinite backwards;
+  }
+  @keyframes glitch-magenta {
+    0% { opacity: 1; clip-path: inset(10% 0 60% 0); transform: translate(-4px, 0); }
+    2% { clip-path: inset(55% 0 15% 0); transform: translate(3px, 0); }
+    4% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, 0); }
+    6%, 100% { opacity: 0; clip-path: inset(0); transform: none; }
+  }
+  @keyframes glitch-cyan {
+    0% { opacity: 1; clip-path: inset(65% 0 5% 0); transform: translate(4px, 0); }
+    3% { clip-path: inset(5% 0 70% 0); transform: translate(-3px, 0); }
+    6%, 100% { opacity: 0; clip-path: inset(0); transform: none; }
+  }
+
+  .hero__role {
+    margin-top: 0.75rem;
+    color: var(--ink);
+    font-size: 1.125rem;
+  }
+  .hero__proof {
+    max-width: 38rem;
+    margin-top: 1rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .copy-email {
+    cursor: pointer;
+  }
+  .copy-feedback {
+    min-height: 1.5rem;
+    margin-top: 0.75rem;
+    color: var(--cyan);
+    font-size: 0.875rem;
+  }
+
+  /* ---------- Terminal (CRT) ---------- */
+  .terminal {
+    /* A saída aparece quando a primeira digitação (~0,7 s) termina */
+    --type-start: 700ms;
+    --out-start: calc(var(--type-start) + 800ms);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: color-mix(in oklab, var(--surface) 92%, transparent);
+    box-shadow:
+      0 24px 60px -24px color-mix(in oklab, var(--magenta) 40%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--magenta) 12%, transparent);
+    font-size: 0.875rem;
+    /* Liga como um monitor velho, uma vez, antes da digitação */
+    animation: crt-on var(--dur-slow) linear 1 both;
+  }
+  /* Scanlines + vinheta do tubo, por cima do conteúdo */
+  .terminal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 2px,
+        color-mix(in oklab, var(--void) 30%, transparent) 2px 3px
+      ),
+      radial-gradient(
+        120% 90% at 50% 50%,
+        transparent 60%,
+        color-mix(in oklab, var(--void) 45%, transparent)
+      );
+  }
+  /* Faixa de varredura que desce devagar, em loop */
+  .terminal::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 30%;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklab, var(--cyan) 6%, transparent),
+      transparent
+    );
+    transform: translateY(-100%);
+    animation: crt-sweep var(--loop-sweep) linear 1s infinite;
+  }
+  @keyframes crt-on {
+    0% { opacity: 0; }
+    8% { opacity: 0.8; }
+    14% { opacity: 0.1; }
+    22% { opacity: 0.9; }
+    30% { opacity: 0.3; }
+    40% { opacity: 1; }
+    48% { opacity: 0.6; }
+    56%, 100% { opacity: 1; }
+  }
+  @keyframes crt-sweep {
+    to { transform: translateY(400%); }
+  }
+  .terminal__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+  .terminal__bar span {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .terminal__bar p {
+    margin-left: auto;
+    color: var(--ink-dim);
+    font-size: 0.75rem;
+  }
+  .terminal__body {
+    padding: 1.25rem 1.25rem 1.5rem;
+    /* Brilho de fósforo: cada linha brilha na própria cor */
+    text-shadow: 0 0 6px color-mix(in oklab, currentColor 45%, transparent);
+  }
+  .terminal__cmd {
+    display: flex;
+    gap: 0.6rem;
+    color: var(--ink);
+  }
+  .terminal__prompt,
+  .contact__prompt {
+    color: var(--cyan);
+  }
+  .terminal__typed {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--magenta);
+    width: 6ch;
+    /*
+     * Ciclo de 8 s: digita (~0,7 s), segura, apaga (~0,7 s) e redigita.
+     * steps(6) só age nos trechos que mudam de largura.
+     */
+    animation:
+      type-loop var(--loop-type) steps(6, end) var(--type-start) infinite both,
+      caret 1s steps(1) infinite;
+  }
+  @keyframes type-loop {
+    0% { width: 0; }
+    9%, 85% { width: 6ch; }
+    94%, 100% { width: 0; }
+  }
+  @keyframes caret {
+    50% { border-color: transparent; }
+  }
+
+  .terminal__out {
+    margin-top: 1rem;
+    animation: fade-in var(--dur-base) var(--ease-out) var(--out-start) 1 both;
+  }
+  .terminal__who {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--magenta);
+    font-weight: 600;
+  }
+  .terminal__who img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface-2);
+  }
+  .terminal dl {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 1rem;
+  }
+  .terminal dl div {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 0.5rem;
+  }
+  .terminal dt {
+    color: var(--ink-dim);
+  }
+  .terminal dd {
+    color: var(--ink);
+  }
+  .terminal dd a {
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+  }
+  .terminal dd a:hover {
+    text-decoration-color: var(--magenta);
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /*
+   * Sem loops, flicker nem varredura: tudo aparece pronto e parado.
+   * Não depender só da regra global (duração 0,01ms + 1 iteração): com fill
+   * both/backwards ela congelaria o quadro 0 (glitch visível, comando vazio).
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .glitch::before,
+    .glitch::after,
+    .terminal,
+    .terminal::before,
+    .terminal__typed,
+    .terminal__out {
+      animation: none !important;
+    }
+    .terminal::before {
+      display: none;
+    }
+    .terminal__typed {
+      border-right-color: transparent;
+    }
+  }
+
+  /* ---------- Seções ---------- */
+  .home-sections {
+    display: grid;
+    gap: 4rem;
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-block: 4rem;
+  }
+  @media (min-width: 960px) {
+    .home-sections {
+      gap: 6rem;
+      padding-block: 6rem;
+    }
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .section-head h2 {
+    color: var(--ink);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  .section-head__more {
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+  }
+  .section-head__more:hover {
+    color: var(--magenta);
+  }
+  .section-lede {
+    max-width: 40rem;
+    margin-bottom: 1.25rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+  }
+
+  /* Projeto principal ocupa mais espaço: cards não são idênticos */
+  .projects-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .projects-grid {
+      grid-template-columns: 1.4fr 1fr;
+      align-items: start;
+    }
+  }
+
+  .reading-grid {
+    display: grid;
+    gap: 4rem;
+  }
+  @media (min-width: 960px) {
+    .reading-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .entry-list {
+    border-top: 1px solid var(--line);
+  }
+  .entry-list li {
+    border-bottom: 1px solid var(--line);
+  }
+  .entry {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+    padding: 0.9rem 0.5rem;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .entry:hover {
+    background: color-mix(in oklab, var(--surface) 70%, transparent);
+  }
+  .entry__title {
+    color: var(--ink);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .entry:hover .entry__title {
+    color: var(--magenta);
+  }
+  .entry__meta {
+    color: var(--ink-dim);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+  @media (max-width: 639px) {
+    .entry {
+      grid-template-columns: 1fr;
+    }
+  }
+  .entry__desc {
+    grid-column: 1 / -1;
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  /* ---------- CTA final ---------- */
+  .contact {
+    scroll-margin-top: 5rem;
+    padding: 2.5rem 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--magenta) 35%, var(--line));
+    border-radius: var(--radius);
+    background:
+      radial-gradient(
+        120% 140% at 0% 0%,
+        color-mix(in oklab, var(--magenta) 10%, transparent),
+        transparent 60%
+      ),
+      var(--surface);
+  }
+  @media (min-width: 768px) {
+    .contact {
+      padding: 3.5rem;
+    }
+  }
+  .contact h2 {
+    color: var(--ink);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  .contact > p:not(.copy-feedback) {
+    max-width: 38rem;
+    margin-top: 1rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+  }
+</style>

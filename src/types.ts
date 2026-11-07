@@ -22,5 +22,4 @@ export type BlogCategory = {
   label: string
   description: string
   icon: string
-  accent: string
 }

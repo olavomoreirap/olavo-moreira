@@ -47,6 +47,20 @@ export async function getAllProjects(): Promise<CollectionEntry<'projects'>[]> {
   })
 }
 
+/** Projetos marcados com `featured`, na ordem definida por `order` (docs/adr/0005). */
+export async function getFeaturedProjects(): Promise<
+  CollectionEntry<'projects'>[]
+> {
+  const projects = await getAllProjects()
+  return projects
+    .filter((project) => project.data.featured)
+    .sort(
+      (a, b) =>
+        (a.data.order ?? Number.MAX_SAFE_INTEGER) -
+        (b.data.order ?? Number.MAX_SAFE_INTEGER),
+    )
+}
+
 export async function getAllTags(): Promise<Map<string, number>> {
   const posts = await getAllPosts()
 

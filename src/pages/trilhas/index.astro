@@ -1,9 +1,8 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
 import { getAllCategories } from '@/lib/data-utils'
+import { formatPostCount } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 
 const categories = await getAllCategories()
@@ -15,46 +14,127 @@ const categories = await getAllCategories()
     title="Trilhas"
     description="Trilhas de estudo para acompanhar o progresso por tema."
   />
-  <Breadcrumbs items={[{ label: 'Trilhas', icon: 'lucide:layers' }]} />
 
-  <section class="space-y-6">
-    <div class="prose">
-      <h1>Trilhas de estudo</h1>
-      <p>
-        Cada trilha agrupa posts por tema para seguir uma sequencia clara de
-        aprendizado.
-      </p>
-    </div>
+  <header class="page-intro">
+    <p class="page-prompt" aria-hidden="true">ls ~/trilhas</p>
+    <h1>Trilhas de estudo</h1>
+    <p>
+      Cada trilha agrupa os posts de um tema numa sequência pensada para ser
+      lida em ordem, do básico ao aplicado.
+    </p>
+  </header>
 
-    <div class="grid gap-4 md:grid-cols-2">
-      {categories.map((category) => (
-        <Link
-          href={`/trilhas/${category.id}`}
-          class={`group relative rounded-2xl border border-primary/15 bg-secondary/30 p-6 transition-all duration-300 hover:border-primary/40 hover:bg-secondary/50 overflow-hidden`}
-        >
-          <div
-            class={`pointer-events-none absolute inset-0 bg-gradient-to-br ${category.accent} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
-          ></div>
-          <div class="relative flex h-full flex-col gap-4">
-            <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-              <Icon name={category.icon} class="size-4 text-primary" />
-              Trilha
-            </div>
-            <div>
-              <h2 class="text-xl font-medium group-hover:text-primary transition-colors">
+  <ul class="trail-grid">
+    {
+      categories.map((category) => (
+        <li>
+          <article class="trail-card">
+            <Icon
+              name={category.icon}
+              class="trail-card__icon size-5"
+              aria-hidden="true"
+            />
+            <h2 class="trail-card__title">
+              <a href={`/trilhas/${category.id}`} class="trail-card__link">
                 {category.label}
-              </h2>
-              <p class="text-sm text-muted-foreground mt-2">
-                {category.description}
-              </p>
-            </div>
-            <div class="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-              <span>{category.count} estudos</span>
-              <span class="text-primary">Ver trilha →</span>
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
-  </section>
+              </a>
+            </h2>
+            <p class="trail-card__desc">{category.description}</p>
+            <p class="trail-card__footer">
+              <span>{formatPostCount(category.count)}</span>
+              <span class="trail-card__cta" aria-hidden="true">
+                cd {category.id}
+              </span>
+            </p>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
 </Layout>
+
+<style>
+  .trail-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    .trail-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .trail-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+  .trail-card:hover,
+  .trail-card:has(.trail-card__link:focus-visible) {
+    border-color: var(--magenta);
+    box-shadow: var(--glow-sm);
+  }
+  .trail-card:has(.trail-card__link:focus-visible) {
+    outline: 2px solid var(--magenta);
+    outline-offset: 2px;
+  }
+
+  .trail-card__icon {
+    color: var(--cyan);
+  }
+
+  .trail-card__title {
+    color: var(--ink);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .trail-card__link {
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .trail-card:hover .trail-card__link {
+    color: var(--magenta);
+  }
+  /* O título cobre o card inteiro como área clicável */
+  .trail-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .trail-card__link:focus-visible {
+    outline: none;
+  }
+
+  .trail-card__desc {
+    color: var(--ink-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .trail-card__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--line);
+    color: var(--ink-dim);
+    font-size: 0.8125rem;
+  }
+  .trail-card__cta {
+    color: var(--cyan);
+  }
+  .trail-card__cta::before {
+    content: '$ ';
+    color: var(--ink-dim);
+  }
+</style>

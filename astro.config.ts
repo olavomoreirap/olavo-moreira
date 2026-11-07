@@ -21,13 +21,12 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  site: 'https://astro-erudite.vercel.app',
+  site: 'https://olavo-moreira.vercel.app',
   integrations: [
     expressiveCode({
-      themes: ['github-light', 'github-dark'],
+      themes: ['github-dark'],
       plugins: [pluginCollapsibleSections(), pluginLineNumbers()],
       useDarkModeMediaQuery: false,
-      themeCssSelector: (theme) => `.${theme.name.split('-')[1]}`,
       defaultProps: {
         wrap: true,
         collapseStyle: 'collapsible-auto',
@@ -100,10 +99,7 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          theme: {
-            light: 'github-light',
-            dark: 'github-dark',
-          },
+          theme: 'github-dark',
         },
       ],
     ],

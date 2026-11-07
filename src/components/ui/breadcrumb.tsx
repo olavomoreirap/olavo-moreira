@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { ChevronRightIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 
 function Breadcrumb({ ...props }: React.ComponentProps<'nav'>) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
+  return <nav aria-label="Trilha de navegação" data-slot="breadcrumb" {...props} />
 }
 
 function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {

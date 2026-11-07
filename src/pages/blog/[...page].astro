@@ -1,6 +1,5 @@
 ---
 import BlogCard from '@/components/BlogCard.astro'
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
 import PaginationComponent from '@/components/ui/pagination'
 import { SITE } from '@/consts'
@@ -21,23 +20,42 @@ const { page } = Astro.props
 
 const postsByYear = groupPostsByYear(page.data)
 const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
+const isFirstPage = page.currentPage === 1
 ---
 
 <Layout>
-  <PageHead slot="head" title="Blog" />
-  <Breadcrumbs
-    items={[
-      { label: 'Blog', href: '/blog', icon: 'lucide:archive' },
-      { label: `Page ${page.currentPage}`, icon: 'lucide:folder-open' },
-    ]}
+  <PageHead
+    slot="head"
+    title={isFirstPage ? 'Blog' : `Blog, página ${page.currentPage}`}
   />
 
-  <div class="flex min-h-[calc(100vh-18rem)] flex-col gap-y-8">
+  <header class="page-intro">
+    <p class="page-prompt" aria-hidden="true">ls ~/blog</p>
+    <h1>Blog</h1>
+    <p>
+      Anotações dos meus estudos sobre Java e Spring Boot, escritas para quem
+      está começando. Para ler em ordem, siga as
+      <a href="/trilhas" class="text-magenta underline underline-offset-4"
+        >trilhas de estudo</a
+      >.
+    </p>
+    {
+      !isFirstPage && (
+        <p class="text-ink-dim text-sm">
+          Página {page.currentPage} de {page.lastPage}
+        </p>
+      )
+    }
+  </header>
+
+  <div class="flex min-h-[calc(100vh-24rem)] flex-col gap-y-10">
     {
       years.map((year) => (
-        <section class="flex flex-col gap-y-4">
-          <div class="font-medium">{year}</div>
-          <ul class="flex flex-col gap-4">
+        <section aria-labelledby={`ano-${year}`}>
+          <h2 id={`ano-${year}`} class="list-divider">
+            {year}
+          </h2>
+          <ul class="divide-line flex flex-col divide-y">
             {postsByYear[year].map((post) => (
               <li>
                 <BlogCard entry={post} />
@@ -49,9 +67,13 @@ const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
     }
   </div>
 
-  <PaginationComponent
-    currentPage={page.currentPage}
-    totalPages={page.lastPage}
-    baseUrl="/blog/"
-  />
+  {
+    page.lastPage > 1 && (
+      <PaginationComponent
+        currentPage={page.currentPage}
+        totalPages={page.lastPage}
+        baseUrl="/blog/"
+      />
+    )
+  }
 </Layout>

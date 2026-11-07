@@ -1,13 +1,10 @@
 ---
 import BlogCard from '@/components/BlogCard.astro'
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
-import { buttonVariants } from '@/components/ui/button'
 import { BLOG_CATEGORIES } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
 import { getAllPosts } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
 import type { CollectionEntry } from 'astro:content'
 
 type Category = (typeof BLOG_CATEGORIES)[number]
@@ -31,12 +28,14 @@ export async function getStaticPaths() {
 }
 
 const { category, posts } = Astro.props as Props
-const isAscending = category.id === 'java-inicial'
+// Java Inicial é uma sequência de estudo: lida do primeiro post para o último
+const isSequential = category.id === 'java-inicial'
 const sortedPosts = [...posts].sort((a, b) =>
-  isAscending
+  isSequential
     ? a.data.date.valueOf() - b.data.date.valueOf()
     : b.data.date.valueOf() - a.data.date.valueOf(),
 )
+const ListTag = isSequential ? 'ol' : 'ul'
 ---
 
 <Layout>
@@ -52,38 +51,70 @@ const sortedPosts = [...posts].sort((a, b) =>
     ]}
   />
 
-  <section class="space-y-6">
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-        <Icon name={category.icon} class="size-4 text-primary" />
-        Trilha
-      </div>
-      <h1 class="text-3xl font-medium">{category.label}</h1>
-      <p class="text-sm text-muted-foreground">{category.description}</p>
-    </div>
-
+  <header class="page-intro">
+    <p class="page-prompt" aria-hidden="true">cd ~/trilhas/{category.id}</p>
+    <h1>{category.label}</h1>
+    <p>{category.description}</p>
     {
-      sortedPosts.length > 0 ? (
-        <ul class="flex flex-col gap-4">
-          {sortedPosts.map((post) => (
-            <li>
-              <BlogCard entry={post} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div class="rounded-2xl border border-primary/15 bg-secondary/30 p-6">
-          <p class="text-muted-foreground">
-            Essa trilha esta em preparacao. Os primeiros estudos entram em
-            breve.
-          </p>
-          <div class="mt-4">
-            <Link href="/blog" class={buttonVariants({ variant: 'outline' })}>
-              Ver posts recentes
-            </Link>
-          </div>
-        </div>
+      isSequential && sortedPosts.length > 0 && (
+        <p class="text-ink-dim text-sm">Leia na ordem, do primeiro ao último.</p>
       )
     }
-  </section>
+  </header>
+
+  {
+    sortedPosts.length > 0 ? (
+      <ListTag
+        class:list={[
+          'divide-line flex flex-col divide-y',
+          { 'trail-steps': isSequential },
+        ]}
+      >
+        {sortedPosts.map((post) => (
+          <li>
+            <BlogCard entry={post} headingLevel={2} />
+          </li>
+        ))}
+      </ListTag>
+    ) : (
+      <div class="trail-empty">
+        <p>
+          Esta trilha está em preparação. Os primeiros estudos entram em breve.
+        </p>
+        <a href="/blog" class="btn-ghost">
+          Ver posts recentes
+        </a>
+      </div>
+    )
+  }
 </Layout>
+
+<style>
+  /* Numeração dos passos só quando a trilha é uma sequência */
+  .trail-steps {
+    counter-reset: step;
+  }
+  .trail-steps > li {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    counter-increment: step;
+  }
+  .trail-steps > li::before {
+    content: counter(step, decimal-leading-zero);
+    padding-top: 1.25rem;
+    color: var(--cyan);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .trail-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    color: var(--ink-muted);
+  }
+</style>

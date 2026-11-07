@@ -1,5 +1,5 @@
 ---
-import { SITE } from '@/consts'
+import { DEFAULT_OG_IMAGE, SITE } from '@/consts'
 
 interface Props {
   title?: string
@@ -7,21 +7,22 @@ interface Props {
 }
 
 const { title = SITE.title, description = SITE.description } = Astro.props
-const image = new URL('/static/1200x630.png', Astro.site)
+const image = new URL(DEFAULT_OG_IMAGE, Astro.site)
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <title>{`${title} | ${SITE.title}`}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={SITE.href} />
+<link rel="canonical" href={canonicalUrl} />
 
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={image} />
 <meta property="og:image:alt" content={title} />
 <meta property="og:type" content="website" />
-<meta property="og:locale" content={SITE.locale} />
+<meta property="og:locale" content={SITE.locale.replace('-', '_')} />
 <meta property="og:site_name" content={SITE.title} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonicalUrl} />
 
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />

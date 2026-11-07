@@ -40,9 +40,10 @@ const MobileMenu = () => {
           size="icon"
           className="md:hidden"
           title="Menu"
+          aria-label="Abrir menu"
         >
           <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle menu</span>
+          <span className="sr-only">Abrir menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-background">

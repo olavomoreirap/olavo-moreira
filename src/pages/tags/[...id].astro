@@ -4,7 +4,7 @@ import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
 import { getAllTags, getPostsByTag } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import { formatPostCount } from '@/lib/utils'
 
 export async function getStaticPaths() {
   const tagMap = await getAllTags()
@@ -25,13 +25,14 @@ export async function getStaticPaths() {
 }
 
 const { tag, posts } = Astro.props
+const postCountLabel = formatPostCount(posts.length)
 ---
 
 <Layout>
   <PageHead
     slot="head"
-    title={`Posts tagged with "${tag}"`}
-    description={`A collection of posts tagged with ${tag}.`}
+    title={`Posts com a tag #${tag}`}
+    description={`Posts do blog marcados com a tag ${tag}.`}
   />
   <Breadcrumbs
     items={[
@@ -40,20 +41,17 @@ const { tag, posts } = Astro.props
     ]}
   />
 
-  <div class="flex flex-wrap items-center gap-2">
-    <h1 class="text-3xl font-medium">Posts tagged with</h1>
-    <span
-      class="bg-secondary flex items-center gap-x-1 rounded-full px-4 py-2 text-2xl font-medium"
-    >
-      <Icon name="lucide:hash" class="size-6 -translate-x-0.5" />{tag}
-    </span>
-  </div>
+  <header class="page-intro">
+    <p class="page-prompt" aria-hidden="true">grep -r "#{tag}" ~/blog</p>
+    <h1>#{tag}</h1>
+    <p>{postCountLabel} com esta tag.</p>
+  </header>
 
-  <ul class="flex flex-col gap-y-4">
+  <ul class="divide-line flex flex-col divide-y">
     {
       posts.map((post) => (
         <li>
-          <BlogCard entry={post} />
+          <BlogCard entry={post} headingLevel={2} />
         </li>
       ))
     }
