@@ -24,7 +24,7 @@ export default defineConfig({
   site: 'https://olavo-moreira.vercel.app',
   integrations: [
     expressiveCode({
-      themes: ['github-dark'],
+      themes: ['synthwave-84'],
       plugins: [pluginCollapsibleSections(), pluginLineNumbers()],
       useDarkModeMediaQuery: false,
       defaultProps: {
@@ -41,18 +41,18 @@ export default defineConfig({
         borderColor: 'var(--border)',
         codeFontFamily: 'var(--font-mono)',
         codeBackground:
-          'color-mix(in oklab, var(--secondary) 25%, transparent)',
+          '#181233', // --surface: precisa ser cor concreta para o cálculo de contraste
         frames: {
           editorActiveTabForeground: 'var(--muted-foreground)',
           editorActiveTabBackground:
-            'color-mix(in oklab, var(--secondary) 25%, transparent)',
+            '#181233',
           editorActiveTabIndicatorBottomColor: 'transparent',
           editorActiveTabIndicatorTopColor: 'transparent',
           editorTabBarBackground: 'transparent',
           editorTabBarBorderBottomColor: 'transparent',
           frameBoxShadowCssValue: 'none',
           terminalBackground:
-            'color-mix(in oklab, var(--secondary) 25%, transparent)',
+            '#181233',
           terminalTitlebarBackground: 'transparent',
           terminalTitlebarBorderBottomColor: 'transparent',
           terminalTitlebarForeground: 'var(--muted-foreground)',
@@ -99,7 +99,7 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          theme: 'github-dark',
+          theme: 'synthwave-84',
         },
       ],
     ],
