@@ -6,6 +6,6 @@ bio: '
 Full Stack Developer with an emphasis on Java & Spring Boot, building systems for financial markets, vacation rental management, and e-signature and digital document management.
 '
 github: 'https://github.com/olavomoreirap'
-linkedin: 'https://linkedin.com/in/olavomoreira'
+linkedin: 'https://www.linkedin.com/in/olavospmoreira/'
 mail: 'olavomoreiracontato@gmail.com'
 ---

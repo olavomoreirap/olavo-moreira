@@ -17,7 +17,7 @@ export const DEFAULT_OG_IMAGE = '/static/1200x630.png'
 /** Fonte única dos dados de contato (docs/adr/0002 e 0006). */
 export const CONTACT = {
   email: 'olavomoreiracontato@gmail.com',
-  linkedin: 'https://linkedin.com/in/olavomoreira',
+  linkedin: 'https://www.linkedin.com/in/olavospmoreira/',
   github: 'https://github.com/olavomoreirap',
   /** Defina como '/cv-olavo-moreira.pdf' quando o arquivo existir em public/. */
   cvHref: null as string | null,
